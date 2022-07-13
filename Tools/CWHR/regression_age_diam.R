@@ -1,0 +1,254 @@
+
+################################################################################
+# Estimate diameter:age regressions
+
+#these are needed to convert LANDIS cohorts to FIA world
+
+#import all FIA data for CA
+fia_trees_ca <- read.csv("D:/Data/fia/rFIA_downloads/CA_TREE.csv") %>%
+  left_join(species_ref[, c("SPCD", "species_code", "shrub", "SFTWD_HRDWD")],
+            by = "SPCD") %>%
+  dplyr::filter(species_code %in% species_class) %>%
+  dplyr::mutate(species_code = ifelse(shrub, "Shrub", species_code)) %>%#replace shrub species with "Shrub" functional type
+  mutate(TOTAGE = TOTAGE + 10)
+
+#look at the diameter:age relationship for each species
+#it's nonlinear, but should be more or less linear on a log-log scale
+for(i in 1:length(unique(fia_trees_ca$species_code))){
+  fia_sub <- fia_trees_ca[fia_trees_ca$species_code == unique(fia_trees_ca$species_code)[i],]
+  
+  if(nrow(fia_sub[!is.na(fia_sub$TOTAGE), ]) > 5){
+    plot(I((DIA)+rnorm(nrow(fia_sub),0,0.1)) ~ I((TOTAGE)+rnorm(nrow(fia_sub),0,0.11)), 
+         data = fia_sub,
+         main = unique(fia_trees_ca$species_code)[i])
+  }
+}
+
+cub_regressions <- fia_trees_ca %>% 
+  dplyr::filter(!is.na(DIA) & !is.na(TOTAGE) & !is.na(SPCD)) %>%
+  filter(species_code %in% species_class) %>%
+  dplyr::group_by(species_code) %>%
+  filter(n() > 10) %>%
+  dplyr::do(model = lm(log(DIA) ~ poly(log(TOTAGE), 2), data = .))
+
+for(i in 1:19){
+  fia_sub <- fia_trees[fia_trees$species_code == cub_regressions$species_code[i], ]
+  plot(DIA ~ TOTAGE, data = fia_sub,
+       main = cub_regressions$species_code[i])
+  
+  newdata = data.frame(TOTAGE = seq(0, max(fia_sub$TOTAGE, na.rm = TRUE), length.out = 1000))
+  preds <- exp(predict(cub_regressions$model[i][[1]], newdata = newdata) + 
+                 var(residuals(cub_regressions$model[i][[1]])))
+  lines(preds ~ newdata$TOTAGE)
+}
+
+nls_regressions <- fia_trees_ca %>% 
+  dplyr::filter(!is.na(DIA) & !is.na(TOTAGE) & !is.na(SPCD)) %>%
+  filter(species_code %in% species_class) %>%
+  dplyr::group_by(species_code) %>%
+  filter(n() > 10) %>%
+  # dplyr::do(model = lm(log(DIA) ~ poly(log(TOTAGE), 1), data = .))
+  dplyr::do(model = nls(log(DIA) ~ SSlogis(log(TOTAGE), Asym, xmid, scal), data = .))
+
+for(i in 1:19){
+  fia_sub <- fia_trees[fia_trees$species_code == agedia_regressions$species_code[i], ]
+  plot(DIA ~ TOTAGE, data = fia_sub,
+       main = agedia_regressions$species_code[i])
+  
+  newdata = data.frame(TOTAGE = seq(0, max(fia_sub$TOTAGE, na.rm = TRUE), length.out = 1000))
+  preds <- exp(predict(agedia_regressions$model[i][[1]], newdata = newdata) + 
+                 var(residuals(agedia_regressions$model[i][[1]]))) 
+  lines(preds ~ newdata$TOTAGE)
+}
+
+
+mixed_model <- lme4::lmer(log(DIA) ~ poly(log(TOTAGE), 2) + (1|species_code), data = fia_trees_ca[!is.na(fia_trees_ca$TOTAGE),])
+
+for(i in 1:length(unique(mixed_model@frame$species_code))){
+  fia_sub <- fia_trees_ca[fia_trees_ca$species_code == unique(mixed_model@frame$species_code)[i], ]
+  plot((DIA) ~ TOTAGE, data = fia_sub,
+       main = unique(mixed_model@frame$species_code)[i])
+  
+  newdata = data.frame(TOTAGE = seq(0, max(fia_sub$TOTAGE, na.rm = TRUE), length.out = 1000),
+                       species_code = unique(mixed_model@frame$species_code)[i])
+  preds <- exp(predict(mixed_model, newdata = newdata) + var(residuals(mixed_model))/2)
+  lines(preds ~ newdata$TOTAGE)
+  abline(h = 0)
+  abline(v = 0)
+}
+
+
+newdata <- expand.grid(TOTAGE = seq(5, 500, by = 5),
+                       species_code = unique(mixed_model@frame$species_code),
+                       preds_lm = NA,
+                       preds_nls = NA,
+                       preds_mixed = NA)
+for(i in 1:nrow(newdata)){
+  newdata$preds_lm[i] <- exp(predict(cub_regressions$model[match(newdata$species_code[i], cub_regressions[[1]])][[1]],
+                                     newdata = data.frame(TOTAGE = newdata$TOTAGE[i])) +
+                               var(residuals(cub_regressions$model[match(newdata$species_code[i], cub_regressions[[1]])][[1]], na.rm = TRUE))/2)
+  newdata$preds_nls[i] <- exp(predict(nls_regressions$model[match(newdata$species_code[i], nls_regressions[[1]])][[1]],
+                                      newdata = data.frame(TOTAGE = newdata$TOTAGE[i])) +
+                                var(residuals(nls_regressions$model[match(newdata$species_code[i], nls_regressions[[1]])][[1]], na.rm = TRUE))/2)
+  
+}
+
+
+newdata$preds_mixed <- exp(predict(mixed_model, newdata = newdata) + 
+                             var(residuals(mixed_model))/2)
+
+charles_data <- read.csv("pred_values_all_spp_catrees.csv") %>%
+  rename(TOTAGE = TOTAGE2,
+         preds1 = exp.pmd1.) %>%
+  left_join(species_ref[, c("COMMON_NAME", "species_code")], by = c("curr_name" = "COMMON_NAME")) %>%
+  left_join(newdata, by = c("species_code", "TOTAGE"))
+
+plot(charles_data$preds_lm ~ charles_data$TOTAGE, xlim = c(0,200), ylim = c(0, 50))
+plot(charles_data$preds_nls ~ charles_data$TOTAGE, xlim = c(0,200), ylim = c(0, 50))
+plot(charles_data$preds_mixed ~ charles_data$TOTAGE, xlim = c(0,200), ylim = c(0, 50))
+abline(h = 24)
+
+plot(charles_data$preds_nls ~ charles_data$preds1, xlim = c(0,100), ylim = c(0,100),
+     xlab = "Charles' predicted diameter",
+     ylab = "Sam's predicted diameter")
+abline(0,1)
+
+
+plot(charles_data[charles_data$TOTAGE < 250, ]$preds_lm ~ charles_data[charles_data$TOTAGE < 250, ]$preds1, 
+     xlim = c(0,50), ylim = c(0,50),
+     xlab = "Charles' predicted diameter (in)",
+     ylab = "Sam's predicted diameter (in)")
+abline(0,1)
+
+plot(charles_data[charles_data$TOTAGE < 250, ]$preds_nls ~ charles_data[charles_data$TOTAGE < 250, ]$preds1, 
+     xlim = c(0,50), ylim = c(0,50),
+     xlab = "Charles' predicted diameter (in)",
+     ylab = "Sam's predicted diameter (in)")
+abline(0,1)
+
+plot(charles_data[charles_data$TOTAGE < 250, ]$preds_mixed ~ charles_data[charles_data$TOTAGE < 250, ]$preds1, 
+     xlim = c(0,50), ylim = c(0,50),
+     xlab = "Charles' predicted diameter (in)",
+     ylab = "Sam's predicted diameter (in)")
+abline(0,1)
+
+write.csv(charles_data, "compare_charles_sam_diameters.csv")
+
+charles_data$diff <- charles_data$preds1 - charles_data$preds_lm
+mean(charles_data$diff, na.rm = TRUE)
+
+write_rds(cub_regressions, "linear_models_diam_from_age.RDS")
+
+
+
+
+################################################################################
+# Estimate age:diameter regressions
+
+#these are needed to convert FIA plots into LANDIS biomass-age cohorts
+
+#import all FIA data for CA
+fia_trees_ca <- read.csv("D:/Data/fia/rFIA_downloads/CA_TREE.csv") %>%
+  left_join(species_ref[, c("SPCD", "species_code", "shrub", "SFTWD_HRDWD")],
+            by = "SPCD") %>%
+  dplyr::filter(species_code %in% species_class) %>%
+  dplyr::mutate(species_code = ifelse(shrub, "Shrub", species_code)) %>%#replace shrub species with "Shrub" functional type
+  mutate(TOTAGE = TOTAGE + 10)
+
+#look at the diameter:age relationship for each species
+#it's nonlinear, but should be more or less linear on a log-log scale
+for(i in 1:length(unique(fia_trees_ca$species_code))){
+  fia_sub <- fia_trees_ca[fia_trees_ca$species_code == unique(fia_trees_ca$species_code)[i],]
+  
+  if(nrow(fia_sub[!is.na(fia_sub$TOTAGE), ]) > 5){
+    plot(I(log(TOTAGE)+rnorm(nrow(fia_sub),0,0.1)) ~ I(log(DIA)+rnorm(nrow(fia_sub),0,0.11)), 
+         data = fia_sub,
+         main = unique(fia_trees_ca$species_code)[i])
+  }
+}
+
+cub_regressions_age <- fia_trees_ca %>% 
+  dplyr::filter(!is.na(DIA) & !is.na(TOTAGE) & !is.na(SPCD)) %>%
+  filter(species_code %in% species_class) %>%
+  dplyr::group_by(species_code) %>%
+  filter(n() > 10) %>%
+  dplyr::do(model = lm(log(TOTAGE) ~ poly(log(DIA), 3), data = .))
+
+for(i in 1:18){
+  fia_sub <- fia_trees[fia_trees$species_code == cub_regressions_age$species_code[i], ]
+  plot(TOTAGE ~ DIA, data = fia_sub,
+       main = cub_regressions_age$species_code[i],
+       ylim = c(0, 400))
+  
+  newdata = data.frame(DIA = seq(1, max(fia_sub$DIA, na.rm = TRUE), length.out = 1000))
+  preds <- exp(predict(cub_regressions_age$model[i][[1]], newdata = newdata))
+  lines(preds ~ newdata$DIA)
+  abline(v = 12)
+}
+
+nls_regressions_age <- fia_trees_ca %>% 
+  dplyr::filter(!is.na(DIA) & !is.na(TOTAGE) & !is.na(SPCD)) %>%
+  filter(species_code %in% species_class) %>%
+  dplyr::group_by(species_code) %>%
+  filter(n() > 10) %>%
+  # dplyr::do(model = lm(log(DIA) ~ poly(log(TOTAGE), 1), data = .))
+  dplyr::do(model = nls(log(TOTAGE) ~ SSlogis(DIA, Asym, xmid, scal), data = .))
+
+for(i in 1:18){
+  fia_sub <- fia_trees[fia_trees$species_code == agedia_regressions$species_code[i], ]
+  plot(TOTAGE ~ DIA, data = fia_sub,
+       main = agedia_regressions$species_code[i],
+       ylim = c(0, 400))
+  
+  newdata = data.frame(DIA = seq(0, max(fia_sub$DIA, na.rm = TRUE), length.out = 1000))
+  preds <- exp(predict(nls_regressions_age$model[i][[1]], newdata = newdata)) 
+  lines(preds ~ newdata$DIA)
+  abline(v = 24)
+}
+
+
+mixed_model_age <- lme4::lmer(log(TOTAGE) ~ poly(log(DIA), 3) + (1|species_code), data = fia_trees_ca[!is.na(fia_trees_ca$TOTAGE),])
+
+for(i in 1:length(unique(mixed_model_age@frame$species_code))){
+  fia_sub <- fia_trees_ca[fia_trees_ca$species_code == unique(mixed_model_age@frame$species_code)[i], ]
+  plot((TOTAGE) ~ DIA, data = fia_sub,
+       main = unique(mixed_model_age@frame$species_code)[i],
+       ylim = c(0, 400))
+  
+  newdata = data.frame(DIA = seq(0, max(fia_sub$TOTAGE, na.rm = TRUE), length.out = 1000),
+                       species_code = unique(mixed_model_age@frame$species_code)[i])
+  preds <- exp(predict(mixed_model_age, newdata = newdata) + var(residuals(mixed_model_age))/2)
+  lines(preds ~ newdata$DIA)
+  abline(h = 0)
+  abline(v = 0)
+  abline(v = 24)
+}
+
+
+#compare predictions
+newdata <- expand.grid(DIA = seq(0, 200, by = 5),
+                       species_code = unique(cub_regressions_age$species_code),
+                       preds = NA)
+for(i in 1:nrow(newdata)){
+  newdata$preds[i] <- exp(predict(cub_regressions_age$model[match(newdata$species_code[i], 
+                                                                  cub_regressions_age[[1]])][[1]],
+                                  newdata = data.frame(DIA = newdata$DIA[i])))
+}
+
+
+newdata$preds_mixed <- exp(predict(mixed_model_age, newdata = newdata) + var(residuals(mixed_model_age))/2)
+
+charles_data <- read.csv("pred_values_all_spp_catrees.csv") %>%
+  rename(TOTAGE = TOTAGE2,
+         DIA = exp.pmd1.) %>%
+  left_join(species_ref[, c("COMMON_NAME", "species_code")], by = c("curr_name" = "COMMON_NAME"))# %>%
+# left_join(newdata, by = c("species_code", "DIA"))
+
+plot(charles_data$TOTAGE ~ charles_data$DIA, xlim = c(0,50), ylim = c(0, 400))
+plot(newdata$preds ~ newdata$DIA, xlim = c(0,50), ylim = c(0, 400))
+plot(newdata$preds_mixed ~ newdata$DIA, xlim = c(0,50), ylim = c(0, 400))
+abline(h = 100)
+abline(v = 24)
+
+
+write_rds(cub_regressions_age, "linear_models_age_from_diam.RDS")

@@ -47,3 +47,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+Tools/CWHR/linear_models_diam_from_age.RDS
+Tools/CWHR/linear_models_age_from_diam.RDS
+Tools/CWHR/fia_trees.csv
