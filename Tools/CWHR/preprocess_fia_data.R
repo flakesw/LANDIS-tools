@@ -12,6 +12,7 @@ fia_folder <- c("D:/data/fia/rFIA_downloads/")
 states <- c("CA", "NV")
 boundary_loc <- "C:/Users/Sam/Documents/Research/TCSI conservation finance/Models/Inputs/masks_boundaries/WIP_Capacity_V1Draft/WIP_Capacity_V1Draft.shp"
 
+
 forest_ref <- read.csv("D:/Data/fia/FIADB_REFERENCE/REF_FOREST_TYPE.csv")  
 
 boundary <-  sf::st_read(boundary_loc) %>%
@@ -24,9 +25,8 @@ all_fia_plot <- paste0(fia_folder, states,"_PLOT.csv") %>%
   dplyr::bind_rows() %>% #combine states into one big list
   dplyr::filter(!is.na(LAT) & !is.na(LON)) %>%
   sf::st_as_sf(coords = c("LON", "LAT"), remove = TRUE, crs = "EPSG:4269") %>% #make spatial
-  sf::st_transform(crs = st_crs(boundary)) %>%
-  sf::st_join(boundary, join = st_within) %>% # subset only plots within boundary
-  dplyr::filter(do.union = TRUE)
+  sf::st_transform(crs = st_crs(boundary))
+
   
 all_fia_cond <- paste0(fia_folder, states,"_COND.csv") %>%
   purrr::map(read.csv) %>%
@@ -54,7 +54,10 @@ fia_cond_reduced <- left_join(fia_cond_reduced, plot_forest_type, by = "PLT_CN")
 fia_cond_reduced$forest_group <- forest_ref[match(fia_cond_reduced$FORTYPCD, forest_ref$VALUE), "TYPGRPCD"]
 
 fia_plot_reduced <- all_fia_plot %>% 
-  inner_join(fia_cond_reduced, by = c("CN" = "PLT_CN"))
+  left_join(fia_cond_reduced, by = c("CN" = "PLT_CN")) %>%  
+  sf::st_join(boundary, join = st_within) %>% # subset only plots within boundary
+  dplyr::filter(do.union == TRUE) %>%
+  sf::st_drop_geometry() 
 
 #----
 #Trees

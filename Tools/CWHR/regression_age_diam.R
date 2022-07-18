@@ -3,12 +3,35 @@
 # Estimate diameter:age regressions
 
 #these are needed to convert LANDIS cohorts to FIA world
+#TODO revise this -- which trees do we want? Can we include CWHR as a predictor?
+
+#species used for classification
+species_class <- c("AbieConc", "AbieMagn", "CaloDecu", "JuniOcci", "PinuAlbi", "PinuBalf", "PinuCont",
+                   "PinuLamb", "PinuJeff", "PinuMont", "PinuPond", "PinuWash", "PseuMenz", "SequGiga", "TorrCali", 
+                   "TsugMert", "AcerMacr", "AlnuRhom", "AlnuRubr", "ArbuMenz", "LithDens", "PopuTrem",
+                   "QuerChry", "QuerKell", "QuerDoug", "QuerWisl", "UmbeCali", "Shrub")
+
+
+species_ref <- read.csv("D:/Data/fia/FIADB_REFERENCE/REF_SPECIES.csv")
+species_ref$species_code <- paste0(
+  substr(species_ref$GENUS, 1, 4),
+  substr(toupper(species_ref$SPECIES), 1, 1), 
+  substr(species_ref$SPECIES, 2, 4)
+)
+
+species_ref <- read.csv("D:/Data/fia/FIADB_REFERENCE/REF_PLANT_DICTIONARY.csv") %>%
+  dplyr::filter(SYMBOL %in% species_ref$SPECIES_SYMBOL) %>%
+  mutate(shrub = grepl("Shrub", .$GROWTH_HABIT, ignore.case = TRUE)) %>%
+  dplyr::select(c(SYMBOL, shrub)) %>%
+  right_join(species_ref, by = c("SYMBOL" = "SPECIES_SYMBOL"))
+
 
 #import all FIA data for CA
 fia_trees_ca <- read.csv("D:/Data/fia/rFIA_downloads/CA_TREE.csv") %>%
   left_join(species_ref[, c("SPCD", "species_code", "shrub", "SFTWD_HRDWD")],
             by = "SPCD") %>%
-  dplyr::filter(species_code %in% species_class) %>%
+  dplyr::filter(species_code %in% species_class &
+                  !is.na(TOTAGE)) %>%
   dplyr::mutate(species_code = ifelse(shrub, "Shrub", species_code)) %>%#replace shrub species with "Shrub" functional type
   mutate(TOTAGE = TOTAGE + 10)
 
@@ -137,9 +160,10 @@ write.csv(charles_data, "compare_charles_sam_diameters.csv")
 charles_data$diff <- charles_data$preds1 - charles_data$preds_lm
 mean(charles_data$diff, na.rm = TRUE)
 
+no_sp_regression <- lm(log(DIA) ~ poly(log(TOTAGE), 2), data = fia_trees_ca)
+
 write_rds(cub_regressions, "linear_models_diam_from_age.RDS")
-
-
+write_rds(no_sp_regression, "linear_models_diam_from_age_no_sp.RDS")
 
 
 ################################################################################
