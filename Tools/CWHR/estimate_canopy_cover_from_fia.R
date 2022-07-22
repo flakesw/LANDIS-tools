@@ -56,87 +56,12 @@ comm_matrix <- fia_trees %>%
   summarise(biomass = sum(DRYBIO_TOTAL, na.rm = TRUE)) %>%
   tidyr::pivot_wider(id_cols = PLT_CN, names_from = species_code, values_from = biomass, values_fill = 0)
 comm_matrix$total_biomass <- rowSums(comm_matrix[, -1])
+#TODO fix SMC and SCN
 
-# classify
-#TODO redo this with new code for TCSI
+#fix a problem with species being absent
+comm_matrix$PinuMono <- 0
+comm_matrix$CWHR_type <- CWHR_type_from_comm_matrix(comm_matrix)
 
-comm_matrix$SMC <- rowSums(comm_matrix[, c("AbieConc", "CaloDecu", "PinuCont", 
-                                           "PinuJeff", "PinuPond", #"PinuLamb", removed PinuLamb because absent from FIA 
-                                           "PinuWash", "PseuMenz", "TorrCali",
-                                           "PinuBalf")])
-comm_matrix$SCN <- rowSums(comm_matrix[, c("AbieMagn", "PinuAlbi", "PinuMont", "TsugMert")])
-comm_matrix$coni <-  rowSums(comm_matrix[, c("AbieConc", "AbieMagn", "CaloDecu", "JuniOcci",
-                                             "PinuAlbi", "PinuCont", "PinuJeff", #PinuLamb,
-                                             "PinuMont", "PinuPond", "PinuWash", "PseuMenz",
-                                             "TsugMert", "PinuBalf", "SequGiga")])
-comm_matrix$hard <- rowSums(comm_matrix[, c("AcerMacr", "AlnuRhom", "AlnuRubr", "ArbuMenz",
-                                            "LithDens", "PopuTrem", #"QuerChry", "QuerKell","QuerWisl", "UmbeCali"
-                                            "QuerDoug")])
-comm_matrix <- comm_matrix %>%
-  mutate(cover.coni = coni > hard & coni > Shrub,
-         cover.hard = hard > coni & (coni/total_biomass) < 0.25,
-         cover.mixed = hard > coni & (coni/total_biomass) > 0.25,
-         cover.shrub = Shrub > hard & Shrub > coni & !cover.mixed & !cover.hard & !cover.coni)
-
-#this is the dumbest thing I've ever written
-comm_matrix$CWHR_type <- 
-  ifelse(comm_matrix$cover.mixed, "mhc",
-  ifelse(comm_matrix$cover.hard & 
-           comm_matrix$PopuTrem / comm_matrix$hard > 0.5, "asp",
-  ifelse(comm_matrix$cover.hard & 
-           ((comm_matrix$ArbuMenz + comm_matrix$LithDens + comm_matrix$QuerDoug) / comm_matrix$hard) > 0.5,
-            "mhw",
-  ifelse(comm_matrix$cover.hard & 
-           ((comm_matrix$AcerMacr + comm_matrix$AlnuRhom + comm_matrix$AlnuRubr)/comm_matrix$hard) > 0.5,
-         "mri",
-  ifelse(comm_matrix$cover.coni & comm_matrix$AbieConc/comm_matrix$coni > 0.5, "wfr",
-  ifelse(comm_matrix$cover.coni & comm_matrix$AbieMagn/comm_matrix$coni > 0.5, "rfr",
-  ifelse(comm_matrix$cover.coni & comm_matrix$PinuJeff/comm_matrix$coni > 0.5, "jpn",
-  ifelse(comm_matrix$cover.coni & comm_matrix$PseuMenz/comm_matrix$coni > 0.5, "dfr",
-  ifelse(comm_matrix$cover.coni & 
-           (comm_matrix$PinuPond + comm_matrix$PinuWash)/comm_matrix$coni > 0.5, "ppn",
-  ifelse(comm_matrix$cover.coni & comm_matrix$PinuCont / comm_matrix$coni > 0.5, "lpn",
-  ifelse(comm_matrix$cover.coni & comm_matrix$JuniOcci / comm_matrix$coni > 0.5, "juo",
-  ifelse(comm_matrix$cover.coni & comm_matrix$SequGiga / comm_matrix$coni > 0.5, "seg",
-  ifelse(comm_matrix$Shrub, "shrub", 
-  ifelse(comm_matrix$cover.coni & 
-           comm_matrix$AbieConc / comm_matrix$coni < 0.5 & 
-           comm_matrix$AbieMagn / comm_matrix$coni < 0.5 &
-           comm_matrix$CaloDecu / comm_matrix$coni < 0.5 &
-           comm_matrix$JuniOcci / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuAlbi / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuCont / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuJeff / comm_matrix$coni < 0.5 &
-           (comm_matrix$PinuPond + comm_matrix$PinuWash) / comm_matrix$coni < 0.5 &
-           comm_matrix$PseuMenz / comm_matrix$coni < 0.5 &
-           comm_matrix$TsugMert / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuBalf / comm_matrix$coni < 0.5 &
-           comm_matrix$SequGiga / comm_matrix$coni < 0.5 &
-           comm_matrix$SMC > comm_matrix$SCN,
-           "smc",
-  ifelse(comm_matrix$cover.coni & 
-           comm_matrix$AbieConc / comm_matrix$coni < 0.5 & 
-           comm_matrix$AbieMagn / comm_matrix$coni < 0.5 &
-           comm_matrix$CaloDecu / comm_matrix$coni < 0.5 &
-           comm_matrix$JuniOcci / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuAlbi / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuCont / comm_matrix$coni < 0.5 &
-           comm_matrix$PinuJeff / comm_matrix$coni < 0.5 &
-           (comm_matrix$PinuPond + comm_matrix$PinuWash) / comm_matrix$coni < 0.5 &
-           comm_matrix$PseuMenz / comm_matrix$coni < 0.5 &
-           comm_matrix$TsugMert / comm_matrix$coni < 0.5 & 
-           comm_matrix$PinuBalf / comm_matrix$coni < 0.5 &
-           comm_matrix$SequGiga / comm_matrix$coni < 0.5 &
-           comm_matrix$SMC < comm_matrix$SCN,
-         "scn",
-  ifelse(comm_matrix$cover.coni & 
-           (comm_matrix$PinuJeff + comm_matrix$PinuPond + comm_matrix$PinuWash)/comm_matrix$coni > 0.5,
-         "yps",
-  ifelse(comm_matrix$cover.coni & 
-           (comm_matrix$PinuMont + comm_matrix$PinuAlbi) / comm_matrix$coni > 0.5,
-         "wps",
-         NA)))))))))))))))))
-  
 #add CWHR types to fia_plot dataframe
 fia_plot <- left_join(fia_plot, comm_matrix[, c("PLT_CN", "CWHR_type")], by = c("CN" = "PLT_CN"))
 
@@ -149,7 +74,7 @@ regressions_age <- readRDS("linear_models_age_from_diam.RDS")
 fia_trees$age_est <- NA
 
 for(i in 1:nrow(fia_trees)){
-  if(fia_trees$species_code[i] %in% regressions_age$species_code){
+  if(fia_trees$species_code[i] %in% regressions_age$SpeciesName){
     fia_trees$age_est[i] <- exp(predict(regressions_age$model[match(fia_trees$species_code[i], 
                                                                     regressions_age[[1]])][[1]],
                                     newdata = data.frame(DIA = fia_trees$DIA[i])))
@@ -163,22 +88,32 @@ fia_trees <- fia_trees %>%
 # biomass in order to regress CC ~ age*CWHR*biomass
 
 tree_summary <- fia_trees %>%
-  filter(DIA > 5) %>%
+  filter(DIA > 0) %>%
   group_by(PLT_CN) %>%
-  summarise(total_biomass = sum(DRYBIO_TOTAL * TPA_UNADJ) / 892, #convert to megagrams per ha,
-            mean_age = weighted.mean(age_est, DRYBIO_TOTAL, na.rm = TRUE))
+  summarise(total_biomass = sum(DRYBIO_TOTAL * TPA_UNADJ) * 2.47, #convert Mg per acre to Mg per ha,
+            mean_age = weighted.mean(age_est, DRYBIO_TOTAL, na.rm = TRUE),
+            total_n_trees = sum(TPA_UNADJ, na.rm = TRUE),
+            ba = sum(DIA^2 * 0.005454, na.rm = TRUE), #in square feet
+            qmd = sqrt(ba/((0.005454*total_n_trees)))) #in inches
 
 fia_plot2 <- left_join(fia_plot, tree_summary, by = c("CN" = "PLT_CN")) %>%
-  filter(fia_plot$cc > 0) %>%
+  filter(cc > 0) %>%
   mutate(cc = cc/100)
+
+dia_breaks <- c(0, 1, 6, 11, 24, 1000)
+fia_plot2$seral_stage <- cut(fia_plot2$qmd, dia_breaks, labels = FALSE)
 
 
 #exploratory plots
 plot(cc ~ total_biomass, data = fia_plot2)
 plot(cc ~ sqrt(total_biomass), data = fia_plot2) #strong relationship
-plot(logit(cc) ~ sqrt(total_biomass), data = fia_plot2) #strong relationship
+plot(cc ~ log(total_biomass), data = fia_plot2)
+plot(logit(cc) ~ sqrt(total_biomass), data = fia_plot2) #strong and linear relationship
+plot(log(cc) ~ log(total_biomass), data = fia_plot2)
 plot(cc ~ mean_age, data = fia_plot2) #little relationship
 boxplot(cc ~ CWHR_type, data = fia_plot2)
+boxplot(cc ~ seral_stage, data = fia_plot2)
+boxplot(total_biomass ~ seral_stage, data = fia_plot2)
 
 #remove CWHR types without enough data to fit a model
 fia_plot_remove_rare <- fia_plot2 %>%
@@ -196,17 +131,33 @@ fia_plot_remove_rare <- fia_plot2 %>%
 # cc ~ age*forest type*biomass
 
 #fit models
-cc_lm <- lm(logit(cc) ~ sqrt(total_biomass)*mean_age*CWHR_type, data = fia_plot_remove_rare)
+# cc_lm <- lm(logit(cc) ~ sqrt(total_biomass)*mean_age*CWHR_type, data = fia_plot_remove_rare)
+# summary(cc_lm)
+
+# cc_lm <- earth::earth(logit(cc) ~ sqrt(total_biomass)*mean_age*CWHR_type, 
+#                       data = fia_plot_remove_rare[!is.na(fia_plot_remove_rare$total_biomass) &
+#                                                     !is.na(fia_plot_remove_rare$mean_age) & 
+#                                                     !is.na(fia_plot_remove_rare$CWHR_type), ])
+cc_lm <- earth::earth(logit(cc) ~ sqrt(total_biomass)*seral_stage*CWHR_type,
+                      data = fia_plot_remove_rare[!is.na(fia_plot_remove_rare$total_biomass) &
+                                                    !is.na(fia_plot_remove_rare$mean_age) &
+                                                    !is.na(fia_plot_remove_rare$CWHR_type), ])
+
+
 summary(cc_lm)
 
-cc_no_cwhr_lm <- lm(logit(cc) ~ sqrt(total_biomass)*mean_age, data = fia_plot2)
+cc_no_cwhr_lm <- earth::earth(logit(cc) ~ sqrt(total_biomass)*seral_stage, 
+                    data = fia_plot2[!is.na(fia_plot2$total_biomass) &
+                                     !is.na(fia_plot2$mean_age) & 
+                                     !is.na(fia_plot2$CWHR_type), ])
 summary(cc_no_cwhr_lm)
 # plot(effects::allEffects(cc_no_cwhr_lm))
 
 cwhr_types <- unique(fia_plot_remove_rare$CWHR_type)[!is.na(unique(fia_plot_remove_rare$CWHR_type))]
 
 newdata = expand.grid(total_biomass = seq(0, 1000, length.out = 1000),
-                      mean_age = c(0, 10, 30, 70, 120, 240),
+                      # mean_age = c(0, 10, 30, 70, 120, 240),
+                      seral_stage = c(1,2,3,4,5),
                       CWHR_type = cwhr_types)
 
 for(i in 1:length(cwhr_types)){
@@ -215,24 +166,24 @@ for(i in 1:length(cwhr_types)){
   
   plot(fia_plot_sub$cc ~ fia_plot_sub$total_biomass,
        main = cwhr_types[i], 
-       xlim = c(0, 1000),
+       xlim = c(0, 400),
        ylim = c(0, 1))
   abline(h = c(0.4, 0.6))
-  for(j in unique(newdata$mean_age)){
+  for(j in unique(newdata$seral_stage)){
     newdat <- newdata[newdata$CWHR_type == cwhr_types[i] &
-                                  newdata$mean_age == j, ]
+                                  newdata$seral_stage == j, ]
     preds <- invlogit(predict(cc_lm, newdat))
     lines( preds ~ newdat$total_biomass)
-    text(y = preds[750], x = 300, 
+    text(y = preds[300], x = 300, 
          labels = j)
     
     }
 }
 
 newdata = expand.grid(total_biomass = seq(0, 400, length.out = 1000),
-                      mean_age = c(0, 10, 30, 70, 120, 240))
+                      seral_stage = c(1,2,3,4,5))
 
-fia_plot_sub <- fia_plot2
+fia_plot_sub <- fia_plot2[!(fia_plot2$CWHR_type %in% cwhr_types), ]
 fia_tree_sub <- fia_trees[fia_trees$PLT_CN %in% fia_plot_sub$CN, ]
 
 plot(fia_plot_sub$cc ~ fia_plot_sub$total_biomass,
@@ -240,8 +191,8 @@ plot(fia_plot_sub$cc ~ fia_plot_sub$total_biomass,
      xlim = c(0, 400),
      ylim = c(0, 1))
 abline(h = c(0.4, 0.6))
-for(j in unique(newdata$mean_age)){
-  newdat <- newdata[newdata$mean_age == j, ]
+for(j in unique(newdata$seral_stage)){
+  newdat <- newdata[newdata$seral_stage == j, ]
   preds <- invlogit(predict(cc_no_cwhr_lm, newdat))
   lines( preds ~ newdat$total_biomass)
   text(y = preds[750], x = 300, 
@@ -249,7 +200,7 @@ for(j in unique(newdata$mean_age)){
   
 }
 
-
+#need to reduce CC for SCN, SMC, RFR
 
 ################################################################################
 # Export models
