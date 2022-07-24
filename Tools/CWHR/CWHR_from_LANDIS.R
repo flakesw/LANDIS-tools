@@ -43,7 +43,9 @@ input_mods_times <- expand.grid(landis_folders, timesteps) %>%
   rename(landis_folder = Var1,
          timestep = Var2)
 
-for(i in 367:nrow(input_mods_times)){
+error_list <- data.frame(landis_folder = character(0), timestep = numeric(0), iter = numeric(0))
+
+for(i in 1:nrow(input_mods_times)){
   timestep <- input_mods_times[i, "timestep"]
   landis_folder <- as.character(input_mods_times[i, "landis_folder"])
   
@@ -51,17 +53,35 @@ for(i in 367:nrow(input_mods_times)){
   scenario_name <- paste0(strsplit(landis_folder, "/")[[1]][[3]], " - ")
   
   
-    
+  error_flag <- FALSE
+  
   start <- Sys.time()
-  process_CWHR_and_write_rasters(landis_folder = landis_folder,
-                                 timestep = timestep,
-                                 output_folder = output_folder,
-                                 prefix = scenario_name,
-                                 dia_regression_rds_loc = dia_regression_rds_loc,
-                                 dia_regression_rds_no_sp_loc = dia_regression_rds_no_sp_loc,
-                                 can_regresison_rds_loc = can_regresison_rds_loc,
-                                 can_regression_rds_no_sp_loc = can_regression_rds_no_sp_loc,
-                                 class = TRUE)
+  tryCatch(
+    {
+      process_CWHR_and_write_rasters(landis_folder = landis_folder,
+                                     timestep = timestep,
+                                     output_folder = output_folder,
+                                     prefix = scenario_name,
+                                     dia_regression_rds_loc = dia_regression_rds_loc,
+                                     dia_regression_rds_no_sp_loc = dia_regression_rds_no_sp_loc,
+                                     can_regresison_rds_loc = can_regresison_rds_loc,
+                                     can_regression_rds_no_sp_loc = can_regression_rds_no_sp_loc,
+                                     class = TRUE)
+    },
+    error = function(cond) {
+        
+        message(paste("Error processing inputs for ", landis_folder," timestep ", timestep))
+        message("Here's the original error message:")
+        message(cond)
+        error_flag <<- TRUE
+    }
+  )
+  
+  if(error_flag){
+    error_list <- rbind(error_list, cbind(landis_folder, timestep, i))
+    next()
+  } 
+
   
   end <- Sys.time()
   end - start

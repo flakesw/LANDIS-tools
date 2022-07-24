@@ -156,47 +156,6 @@ CWHR_type_from_comm_matrix <- function(comm_matrix){
   return(class)
 }
 
-#*******************************************************************************
-#*
-
-classify_forest_type_comm_output <- function(comm_table){
-  #This function takes the location of the community output table from LANDIS ]
-  # and returns a dataframe that maps the MapCode from the community output table
-  # to a CWHR vegetation type code
-  
-  #The vegetation types and species have been reduced to match TCSI. This code
-  #would need to be revised to accept new species and types. This would be a 
-  #good place to make improvements. SF
-  
-  comm <- read.csv(comm_table) %>%
-    filter(complete.cases(.))
-  
-  #replace shrub FTs with shrub
-  #TODO make this flexible
-  comm[comm$SpeciesName %in% c("FX_R_SEED", "NOFX_R_SEED", "NOFX_NOR_SEED"), "SpeciesName"] <- "Shrub"
-  species <- unique(comm$SpeciesName)
-  
-  
-  # sum biomass for each stand
-  comm_matrix <- comm %>%
-    dplyr::group_by(MapCode, SpeciesName) %>%
-    summarise(biomass = sum(CohortBiomass, na.rm = TRUE)) %>%
-    tidyr::pivot_wider(id_cols = MapCode, names_from = SpeciesName, 
-                       values_from = biomass, values_fill = 0) %>%
-    dplyr::ungroup()
-  comm_matrix$total_biomass <- rowSums(comm_matrix[, -1])
-
-  #classify matrix into CWHR type
-  comm_matrix$CWHR_type <- CWHR_type_from_comm_matrix(comm_matrix)
-  
-if(length(which(is.na(comm_matrix$CWHR_type))) > 0){
-  warning("Some MapCodes were not assigned CWHR types (", 
-           length(which(is.na(comm_matrix$CWHR_type))),
-           " sites)")
-}
-
-return(comm_matrix[, c("MapCode", "CWHR_type")])
-}
 
 #*******************************************************************************
 #* Classify forest types
@@ -420,37 +379,53 @@ calculate_canopy_cover <- function(comm_matrix,
 }
 
 #*******************************************************************************
-# create_canopy_cover_raster <- function(output_folder, 
-#                                       comm_matrix, 
-#                                       comm_raster,
-#                                       file_prefix = "",
-#                                       timestep,
-#                                       class = TRUE){ 
-#   
-#   cc_breaks <- c(0,0.1,0.25,0.4,0.6,1)
-#   comm_matrix$cc_class <- cut(comm_matrix$cc, cc_breaks, labels = FALSE) - 1
-#   
-#   if(class == TRUE){
-#     message("   Writing canopy cover class raster to ", paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"))
-#     cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc_class")]) %>%
-#       terra::clamp(lower = 0, upper = 4, values = FALSE) 
-#     writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
-#     message("   Done writing canopy cover class raster")
-#   } else if(class == FALSE){
-#     message("   Writing canopy cover continuous values raster to ", paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"))
-#     cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc")]) %>%
-#       terra::clamp(lower = 0, upper = 1, values = FALSE)
-#     writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
-#     message("   Done writing canopy cover continuous values raster")
-#   }
-# }
+create_canopy_cover_raster <- function(output_folder,
+                                      comm_matrix,
+                                      comm_raster,
+                                      file_prefix = "",
+                                      timestep,
+                                      class = TRUE){
 
+  cc_breaks <- c(0,0.1,0.25,0.4,0.6,1)
+  comm_matrix$cc_class <- cut(comm_matrix$cc, cc_breaks, labels = FALSE) - 1
+
+  if(class == TRUE){
+    message("   Writing canopy cover class raster to ", paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"))
+    cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc_class")]) %>%
+      terra::clamp(lower = 0, upper = 4, values = FALSE)
+    writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
+    message("   Done writing canopy cover class raster")
+  } else if(class == FALSE){
+    message("   Writing canopy cover continuous values raster to ", paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"))
+    cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc")]) %>%
+      terra::clamp(lower = 0, upper = 1, values = FALSE)
+    writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
+    message("   Done writing canopy cover continuous values raster")
+  }
+}
+
+#*******************************************************************************
+create_lai_raster <- function(output_folder,
+                              comm_matrix,
+                              comm_raster,
+                              file_prefix = "",
+                              timestep,
+                              lai_name
+                              ){
+  message("   Writing LAI raster for ", lai_name, " to ", 
+          paste0(output_folder, file_prefix, "cc_class-", lai_name, "-", timestep, ".tif"))
+  lai_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", lai_name)]) %>%
+    terra::clamp(lower = 0, upper = 1, values = FALSE)
+  writeRaster(lai_raster, paste0(output_folder, file_prefix, "cc_class-", lai_name, "-", timestep, ".tif"), overwrite = TRUE)
+  message("   Done writing canopy cover class raster")
+}
 
 
 #*******************************************************************************
 #* Process community input files and create raster outputs
 #*******************************************************************************
-process_CWHR_and_write_rasters <- function(landis_folder,
+process_DHSVM_layers_and_write_rasters <- function(landis_folder,
+                                           template,
                                            timestep,
                                            output_folder,
                                            prefix,
@@ -458,7 +433,7 @@ process_CWHR_and_write_rasters <- function(landis_folder,
                                            dia_regression_rds_no_sp_loc,
                                            can_regresison_rds_loc,
                                            can_regression_rds_no_sp_loc,
-                                           class = TRUE){
+                                           class = FALSE){
   
   message(paste0("Beginning processing LANDIS run ", landis_folder))
   
@@ -466,7 +441,8 @@ process_CWHR_and_write_rasters <- function(landis_folder,
   
   #otherwise the warning is converted to error
   options(warn = 1)
-  comm_raster <- terra::rast(paste0(landis_folder, "output-community-",timestep, ".img"))
+  comm_raster <- terra::rast(paste0(landis_folder, "output-community-",timestep, ".img")) %>%
+    project_to_template(template)
   NAflag(comm_raster) <- NaN
   values(comm_raster)[values(comm_raster) == 0] <- NaN
   
@@ -528,19 +504,10 @@ process_CWHR_and_write_rasters <- function(landis_folder,
   comm_matrix$CWHR_type <- CWHR_type_from_comm_matrix(comm_matrix)
   
   if(length(which(is.na(comm_matrix$CWHR_type))) > 0){
-    message("Some MapCodes were not assigned CWHR types (", 
-            length(which(is.na(comm_matrix$CWHR_type))),
+    message("Some MapCodes were not assigned CWHR veg types (", 
+            length(which(is.na(comm_matrix$veg_type))),
             " sites)")
   }
-  
-  #TODO need to separate into with and without understory before writing raster
-  # create_forest_type_raster(output_folder = output_folder, 
-  #                           comm_matrix = comm_matrix, 
-  #                           comm_raster = comm_raster,
-  #                           file_prefix = prefix,
-  #                           timestep = timestep,
-  #                           class_table = class_table)
-  
   
   #*******************************************************************************
   # Stand seral stage
@@ -572,12 +539,29 @@ process_CWHR_and_write_rasters <- function(landis_folder,
   #*******************************************************************************
   # LAI -- split by overstory and understory
   #*******************************************************************************
-  #TODO figure out what to do with timestep 0
-  
-  
+
   #TODO fix for proper folder
-  lai_raster <- terra::rast(paste0("D:/Data/TCSI/TCSI_scenario3 - complete/", "NECN/", "LAI-", timestep, ".img"))
-  plot(lai_raster)
+  #what timesteps exist for the NECN outputs?
+  necn_folder <- paste0(landis_folder, "NECN/")
+  lai_files <- list.files(necn_folder, pattern = "LAI")
+  lai_files <- gsub("-", "", lai_files)
+  lai_years <- readr::parse_number(lai_files)
+  
+  timestep2 <- timestep
+  if(timestep == 0){
+    timestep2 <- min(lai_years)
+    message(paste0("Timestep is lower than first NECN output; setting timestep = ", timestep2))
+  } else if(!(timestep %in% lai_years)){
+    error_flag <- TRUE
+    message("Timestep has no LAI layer -- check that timesteps align for community
+            output file and NECN")
+  }
+  if(error_flag){
+    next()
+  }
+  
+  lai_raster <- terra::rast(paste0(necn_folder, "LAI-", timestep2, ".img"))
+  # plot(lai_raster)
   lai_vals <- data.frame(cbind(terra::values(comm_raster), terra::values(lai_raster)))
   names(lai_vals) <- c("MapCode", "LAI")
 
@@ -586,23 +570,36 @@ process_CWHR_and_write_rasters <- function(landis_folder,
   comm_matrix$LAI_shrub <- comm_matrix$LAI*comm_matrix$shrub_proportion #assign LAI weighted by biomass
   comm_matrix$LAI_tree <- comm_matrix$LAI*comm_matrix$overstory_proportion
   
+  create_lai_raster(output_folder = output_folder,
+                    comm_matrix = comm_matrix,
+                    comm_raster = comm_raster,
+                    file_prefix = scenario_name,
+                    timestep = timestep,
+                    lai_name = "LAI_shrub")
+  create_lai_raster(output_folder = output_folder,
+                    comm_matrix = comm_matrix,
+                    comm_raster = comm_raster,
+                    file_prefix = scenario_name,
+                    timestep = timestep,
+                    lai_name = "LAI_tree")
+  
   
   #*******************************************************************************
-  #* Create CWHR codes
-  #*******************************************************************************
+  #* Create CWHR DHSVM Codes
+  #* **********************************************************************
   
   #TODO make into DHSVM vegetation classes
   
   
   comm_matrix <- comm_matrix %>% 
-    dplyr::inner_join(class_table, by = c("veg_type" = "type")) %>%
-    mutate(CWHR_code = as.numeric(paste0(num, )))
-  table(comm_matrix$CWHR_code)
+    dplyr::inner_join(class_table, by = c("CWHR_type" = "type")) %>%
+    mutate(DHSVM_code = as.numeric(paste0(as.character(num), ifelse(shrub_proportion > 0.01, "02", "01"))))
+  table(comm_matrix$DHSVM_code)
   
   message("   Writing veg ID raster to ", paste0(output_folder, prefix, "veg-ID-", timestep, ".tif"))
-  cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "veg_type")]) %>%
-    terra::clamp(lower = min(unique(comm_matrix$CWHR_code)), 
-                 upper = max(unique(comm_matrix$CWHR_code)), 
+  cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "DHSVM_code")]) %>%
+    terra::clamp(lower = min(unique(comm_matrix$DHSVM_code)), 
+                 upper = max(unique(comm_matrix$DHSVM_code)), 
                  values = FALSE)
   writeRaster(cwhr_raster, paste(output_folder, prefix, "veg-ID-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing veg ID raster")

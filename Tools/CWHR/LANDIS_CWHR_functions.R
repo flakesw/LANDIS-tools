@@ -518,7 +518,7 @@ process_CWHR_and_write_rasters <- function(landis_folder,
   # each chunk individually, then mosaic back together.
   
   
-  #TODO update these
+  
   class_table <- as.data.frame(
     rbind(c("asp", 1),
           c("mhw", 2),

@@ -24,7 +24,6 @@ library("terra")
 library("earth") #for the predictions
 
 source("LANDIS_DHSVM_functions.R")
-source("preprocess_fia_data.R")
 
 #where are the regressions to relate age to diameter and biomass to canopy cover?
 can_regresison_rds_loc <- "canopy_cover_with_CWR_type_lm.RDS"
@@ -32,20 +31,25 @@ can_regression_rds_no_sp_loc <- "canopy_cover_without_CWR_type_lm.RDS"
 dia_regression_rds_loc = "linear_models_diam_from_age.RDS"
 dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS"
 
+
 #What models and timesteps to use?
-timesteps <- c(0, 40, 70)
-landis_folders <- c("E:/TCSI/Scenario1 - historical - Run 1/",
-                    "E:/TCSI/Scenario1 - historical - Run 2/")
+timesteps <- seq(0, 80, by = 10)
+landis_folders <- list.dirs("E:/TCSI LANDIS", recursive = FALSE)
+landis_folders <- paste0(landis_folders[grep("Scenario", landis_folders)], "/")
+
+template <- terra::rast("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Inputs/masks_boundaries/mask.tif")
 
 #where should the outpuits go?
-output_folder <- "E:/TCSI/CWHR_outputs/"
+output_folder <- "E:/TCSI LANDIS/Outputs_to_DHSVM/"
 
 #Combinations of timesteps and landis runs
 input_mods_times <- expand.grid(landis_folders, timesteps) %>%
   rename(landis_folder = Var1,
          timestep = Var2)
 
-for(i in 1:nrow(input_mods_times)){
+error_list <- data.frame(landis_folder = character(0), timestep = numeric(0), iter = numeric(0))
+i <- 1
+for(i in c(1,3)){
   timestep <- input_mods_times[i, "timestep"]
   landis_folder <- as.character(input_mods_times[i, "landis_folder"])
   
@@ -53,19 +57,38 @@ for(i in 1:nrow(input_mods_times)){
   scenario_name <- paste0(strsplit(landis_folder, "/")[[1]][[3]], " - ")
   
   
-    
+  error_flag <- FALSE
+  
   start <- Sys.time()
-  process_CWHR_and_write_rasters(landis_folder = landis_folder,
-                                 timestep = timestep,
-                                 output_folder = output_folder,
-                                 prefix = scenario_name,
-                                 dia_regression_rds_loc = dia_regression_rds_loc,
-                                 dia_regression_rds_no_sp_loc = dia_regression_rds_no_sp_loc,
-                                 can_regresison_rds_loc = can_regresison_rds_loc,
-                                 can_regression_rds_no_sp_loc = can_regression_rds_no_sp_loc,
-                                 class = TRUE)
+  tryCatch(
+    {
+      process_DHSVM_layers_and_write_rasters(landis_folder = landis_folder,
+                                     template = template,
+                                     timestep = timestep,
+                                     output_folder = output_folder,
+                                     prefix = scenario_name,
+                                     dia_regression_rds_loc = dia_regression_rds_loc,
+                                     dia_regression_rds_no_sp_loc = dia_regression_rds_no_sp_loc,
+                                     can_regresison_rds_loc = can_regresison_rds_loc,
+                                     can_regression_rds_no_sp_loc = can_regression_rds_no_sp_loc,
+                                     class = TRUE)
+    },
+    error = function(cond) {
+      
+      message(paste("Error processing inputs for ", landis_folder," timestep ", timestep))
+      message("Here's the original error message:")
+      message(cond)
+      error_flag <<- TRUE
+    }
+  )
+  
+  if(error_flag){
+    error_list <- rbind(error_list, cbind(landis_folder, timestep, i))
+    next()
+  } 
+  
   
   end <- Sys.time()
   end - start
-
+  
 }
