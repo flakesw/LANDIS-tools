@@ -569,6 +569,23 @@ process_CWHR_and_write_rasters <- function(landis_folder,
                              class = FALSE
   )
 
+  #*******************************************************************************
+  # LAI -- split by overstory and understory
+  #*******************************************************************************
+  #TODO figure out what to do with timestep 0
+  
+  
+  #TODO fix for proper folder
+  lai_raster <- terra::rast(paste0("D:/Data/TCSI/TCSI_scenario3 - complete/", "NECN/", "LAI-", timestep, ".img"))
+  plot(lai_raster)
+  lai_vals <- data.frame(cbind(terra::values(comm_raster), terra::values(lai_raster)))
+  names(lai_vals) <- c("MapCode", "LAI")
+
+  comm_matrix <- left_join(comm_matrix, lai_vals, 
+                           by = "MapCode")
+  comm_matrix$LAI_shrub <- comm_matrix$LAI*comm_matrix$shrub_proportion #assign LAI weighted by biomass
+  comm_matrix$LAI_tree <- comm_matrix$LAI*comm_matrix$overstory_proportion
+  
   
   #*******************************************************************************
   #* Create CWHR codes
