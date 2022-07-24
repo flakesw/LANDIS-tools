@@ -20,9 +20,9 @@
 
 library("tidyverse")
 library("terra")
+library("earth") #needed for the regression model predictions -- change if you're using lme4, randomForest, etc.
 
-source("LANDIS_CWHR_functions.R")
-source("preprocess_fia_data.R")
+source("LANDIS_CWHR_functions.R") #this is the meat of how this works
 
 #where are the regressions to relate age to diameter and biomass to canopy cover?
 can_regresison_rds_loc <- "canopy_cover_with_CWR_type_lm.RDS"
@@ -31,19 +31,19 @@ dia_regression_rds_loc = "linear_models_diam_from_age.RDS"
 dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS"
 
 #What models and timesteps to use?
-timesteps <- c(0, 40, 70)
-landis_folders <- c("E:/TCSI/Scenario1 - historical - Run 1/",
-                    "E:/TCSI/Scenario1 - historical - Run 2/")
+timesteps <- seq(0, 80, by = 10)
+landis_folders <- list.dirs("E:/TCSI LANDIS", recursive = FALSE)
+landis_folders <- paste0(landis_folders[grep("Scenario", landis_folders)], "/")
 
 #where should the outpuits go?
-output_folder <- "E:/TCSI/CWHR_outputs/"
+output_folder <- "E:/TCSI LANDIS/CWHR_outputs/"
 
 #Combinations of timesteps and landis runs
 input_mods_times <- expand.grid(landis_folders, timesteps) %>%
   rename(landis_folder = Var1,
          timestep = Var2)
 
-for(i in 1:nrow(input_mods_times)){
+for(i in 367:nrow(input_mods_times)){
   timestep <- input_mods_times[i, "timestep"]
   landis_folder <- as.character(input_mods_times[i, "landis_folder"])
   

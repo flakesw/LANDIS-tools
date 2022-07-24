@@ -377,13 +377,13 @@ create_seral_stage_raster <- function(output_folder,
     message("   Writing seral class raster to ", paste0(output_folder, file_prefix, "seral_class-", timestep, ".tif"))
     seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "seral_class")]) %>%
       terra::clamp(upper = 5, values = FALSE) 
-    writeRaster(seral_raster, paste(output_folder, file_prefix, "seral_class-", timestep, ".tif"), overwrite = TRUE)
+    writeRaster(seral_raster, paste0(output_folder, file_prefix, "seral_class-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing seral stage raster")
   } else if(class == FALSE){
     message("   Writing mean diameter raster to ", paste0(output_folder, file_prefix, "mean_diameter-", timestep, ".tif"))
     seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "weighted_mean_diam")]) %>%
-      terra::clamp(upper = 5, values = FALSE) 
-    writeRaster(seral_raster, paste(output_folder, file_prefix, "seral_class-", timestep, ".tif"), overwrite = TRUE)
+      terra::clamp(upper = 200, values = FALSE) 
+    writeRaster(seral_raster, paste0(output_folder, file_prefix, "mean_diameter-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing mean diameter raster")
   }
   
@@ -406,6 +406,7 @@ calculate_canopy_cover <- function(comm_matrix,
   # cwhr_types_with_mod <- unique(can_model$model$CWHR_type)
   cwhr_types_with_mod <- can_model$xlevels$CWHR_type
   all_cwhr_types <- unique(comm_matrix$CWHR_type)
+  all_cwhr_types <- all_cwhr_types[!is.na(all_cwhr_types)]
   
   comm_matrix$cc <- NA
   
@@ -413,14 +414,21 @@ calculate_canopy_cover <- function(comm_matrix,
   comm_matrix$seral_stage <- cut(comm_matrix$weighted_mean_diam, breaks = c(0,1,6,11,24,1000), labels = FALSE)
   
   for(i in 1:length(all_cwhr_types)){
+    
+    # this has some dumb workarounds to avoid problems that arise when there are 
+    # NAs for CWHR codes. It causes there to be different lengths for comm_matrix
+    # and the predictions. I'd love to make this less dumb.
+    
     cwhr <- all_cwhr_types[i]
+    newdata <- subset(comm_matrix, CWHR_type == cwhr)
+    newdata$cc <- NA
     if(cwhr %in% cwhr_types_with_mod){
-      comm_matrix[comm_matrix$CWHR_type == cwhr, "cc"] <- invlogit(predict(can_model, 
-                                                                             newdata = comm_matrix[comm_matrix$CWHR_type == cwhr, ]))
+      newdata$cc <- invlogit(predict(can_model, newdata = newdata))[, 1]
     } else{
-      comm_matrix[comm_matrix$CWHR_type == cwhr, "cc"] <- invlogit(predict(can_model_no_cwhr, 
-                                                                             newdata = comm_matrix[comm_matrix$CWHR_type == cwhr, ]))
+      newdata$cc <- invlogit(predict(can_model_no_cwhr, newdata = newdata))[, 1]
     }
+    
+    comm_matrix[match(newdata$MapCode, comm_matrix$MapCode), ]$cc <- newdata$cc
   }
   
   return(comm_matrix$cc)
@@ -440,13 +448,13 @@ create_canopy_cover_raster <- function(output_folder,
     message("   Writing canopy cover class raster to ", paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"))
     cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc_class")]) %>%
       terra::clamp(lower = 0, upper = 4, values = FALSE) 
-    writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
+    writeRaster(cc_raster, paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing canopy cover class raster")
   } else if(class == FALSE){
     message("   Writing canopy cover continuous values raster to ", paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"))
     cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc")]) %>%
       terra::clamp(lower = 0, upper = 1, values = FALSE)
-    writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
+    writeRaster(cc_raster, paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing canopy cover continuous values raster")
   }
 }
@@ -601,7 +609,7 @@ process_CWHR_and_write_rasters <- function(landis_folder,
     terra::clamp(lower = min(unique(comm_matrix$CWHR_code)), 
                  upper = max(unique(comm_matrix$CWHR_code)), 
                  values = FALSE)
-  writeRaster(cwhr_raster, paste(output_folder, prefix, "CWHR_ID-", timestep, ".tif"), overwrite = TRUE)
+  writeRaster(cwhr_raster, paste0(output_folder, prefix, "CWHR_ID-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing CWHR ID raster")
   
   gc()
