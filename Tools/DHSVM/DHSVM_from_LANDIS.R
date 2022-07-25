@@ -48,8 +48,8 @@ input_mods_times <- expand.grid(landis_folders, timesteps) %>%
          timestep = Var2)
 
 error_list <- data.frame(landis_folder = character(0), timestep = numeric(0), iter = numeric(0))
-i <- 1
-for(i in c(1,3)){
+
+for(i in 1:nrow(input_mods_times)){
   timestep <- input_mods_times[i, "timestep"]
   landis_folder <- as.character(input_mods_times[i, "landis_folder"])
   

@@ -282,7 +282,7 @@ calculate_ages_and_dias <- function(comm = comm,
   
   comm$biomass <- comm$CohortBiomass * 180*180 / (10^6) #convert from g/m2 to Mg (per site)
   
-  #fill in 
+
   #this takes about a minute
   for(i in 1:length(sp_in_comm)){
     sp = sp_in_comm[i]
