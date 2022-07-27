@@ -1,0 +1,11 @@
+LAI annual fluctuations
+
+Start in october
+Pure conifer	                 1  1    1    1    1    1  1  1  1  1  1  1
+Mixed conifer                    1  1   .9   .9   .9   .9  1  1  1  1  1  1
+Mixed hardwood-conifer	         1  1   .8   .8   .8   .8  1  1  1  1  1  1
+Mixed riparian    	         1  1   .5   .5   .5   .5  1  1  1  1  1  1
+Aspen                            1  1   .2   .2   .2   .2  1  1  1  1  1  1	
+
+
+Note: LAI in NECN is only calculated from leaves -- I replaced any zero values with 0.2 (Fang et al. 2019).

@@ -18,7 +18,7 @@
 # Forest type raster
 # Stand seral stage raster
 # Canopy cover raster
-# 
+ 
 
 library("tidyverse")
 library("terra")
@@ -31,7 +31,6 @@ can_regresison_rds_loc <- "canopy_cover_with_CWR_type_lm.RDS"
 can_regression_rds_no_sp_loc <- "canopy_cover_without_CWR_type_lm.RDS"
 dia_regression_rds_loc = "linear_models_diam_from_age.RDS"
 dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS"
-
 
 #What models and timesteps to use?
 timesteps <- seq(0, 80, by = 10)
