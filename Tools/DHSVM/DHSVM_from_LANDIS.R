@@ -12,6 +12,7 @@
 # template (mask) raster
 # .RDS file with model to predict CC
 # .RDS file with models to convert AGE -> DIA
+# .RDS file with models to convert AGE -> HT
 
 # Outputs:
 # Forest type raster

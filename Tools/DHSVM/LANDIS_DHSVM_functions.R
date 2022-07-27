@@ -211,26 +211,21 @@ create_forest_type_raster <- function(output_folder,
 #* Stand seral stage
 #* *****************************************************************************
 
-calculate_ages_and_dias <- function(comm = comm,
+calculate_age_ht_dia <- function(comm = comm,
                                       dia_regression_rds_loc = "linear_models_diam_from_age.RDS",
-                                      dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS" #,
-                                      # biomass_regression_rds_loc = "linear_models_biomass_from_age.RDS",
-                                      # biomass_regression_rds_no_sp_loc = "linear_models_biomass_from_age_no_sp.RDS"
+                                      dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS",
+                                      ht_regression_rds_loc = "linear_models_ht_from_age.RDS",
+                                      ht_regression_rds_no_sp_loc = "linear_models_ht_from_age_no_sp.RDS"
                                       ){
   
   #import regression equations fit from FIA data, see regression_age_diam.R
   age_to_dia_reg <- readRDS(dia_regression_rds_loc)
-  # age_to_dia_reg <- readRDS("mixed_model_diam_from_age.RDS")
   age_to_dia_reg_no_sp <- readRDS(dia_regression_rds_no_sp_loc)
-  # 
-  # age_to_biomass_reg <- readRDS(biomass_regression_rds_loc)
-  # age_to_biomass_reg_no_sp <- readRDS(biomass_regression_rds_no_sp_loc)
-  # 
-  # get predictions for diameter from age
-  # TODO check whether we can include biomass in regressions
+ 
+  age_to_ht_reg <- readRDS(ht_regression_rds_loc)
+  age_to_ht_reg_no_sp <- readRDS(ht_regression_rds_no_sp_loc)
   
   sp_in_comm <- unique(comm$SpeciesName)
-  # sp_in_mod <- unique(age_to_dia_reg@frame$SpeciesName) #for mixed
   
   comm$biomass <- comm$CohortBiomass * 180*180 / (10^6) #convert from g/m2 to Mg (per site)
   
@@ -238,26 +233,21 @@ calculate_ages_and_dias <- function(comm = comm,
   #this takes about a minute
   for(i in 1:length(sp_in_comm)){
     sp = sp_in_comm[i]
-    # if(sp %in% sp_in_mod){#for mixed
     if(sp %in% age_to_dia_reg$SpeciesName){
-      # comm[comm$SpeciesName == sp, "dia"] <- exp(predict(age_to_dia_reg, newdata = comm[comm$SpeciesName == sp, ])) #for mixed
+     
       comm[comm$SpeciesName == sp, "dia"] <- exp(predict(age_to_dia_reg$model[age_to_dia_reg$SpeciesName == sp][[1]],
                                                       newdata = comm[comm$SpeciesName == sp, ]))
+      comm[comm$SpeciesName == sp, "ht"] <- exp(predict(age_to_ht_reg$model[age_to_ht_reg$SpeciesName == sp][[1]],
+                                                         newdata = comm[comm$SpeciesName == sp, ]))
       
-      #how much biomass does each individual in the cohort take? Estimated from age
-      # comm[comm$SpeciesName == sp, "biomass_per_ind"] <- exp(predict(age_to_biomass_reg$model[age_to_biomass_reg$SpeciesName == sp][[1]],
-      #                                                    newdata = comm[comm$SpeciesName == sp, ]))
+      
     } else{
       comm[comm$SpeciesName == sp, "dia"] <- exp(predict(age_to_dia_reg_no_sp, newdata = comm[comm$SpeciesName == sp, ]))
-      # comm[comm$SpeciesName == sp, "biomass_per_ind"] <- exp(predict(age_to_biomass_reg_no_sp, 
-      #                                                                newdata = comm[comm$SpeciesName == sp, ]))
+      comm[comm$SpeciesName == sp, "ht"] <- exp(predict(age_to_ht_reg_no_sp, newdata = comm[comm$SpeciesName == sp, ]))
+     
     }
   }
   
-  # comm$dia <- ifelse(comm$dia < .1, .1, comm$dia) #increase size of tiny trees; TODO is this right?
-  
-  # comm$n_trees <- comm$biomass/ comm$biomass_per_ind 
-  #LANDIS biomass is in Mg per site; regression was in Mg/ind. The result here should be Ind/site
   
   #aggregate to plot
   plot_age_dia <- comm %>%
@@ -266,82 +256,17 @@ calculate_ages_and_dias <- function(comm = comm,
     dplyr::summarise(mean_age = weighted.mean(TOTAGE, CohortBiomass), #age calculated here doesn't actually affect the seral stages;
                                                                       #that's all determined by the regression equations and how
                                                                       #diameter is aggregated. It does affect CC calculoations.
-                     # mean_age_n = weighted.mean(TOTAGE, n_trees),
                      mean_age_unweighted = mean(TOTAGE),
                      weighted_mean_diam = weighted.mean(dia, CohortBiomass),
                      mean_diam = mean(dia),
                      root_average = sqrt(weighted.mean((dia)^2, CohortBiomass)),
-                     # total_n_trees = sum(n_trees),
-                     # ba = sum(dia^2 * 0.005454), #in square feet
-                     # qmd = sqrt(ba/((0.005454*total_n_trees))), #in inches
-                     max_dia = max(dia)) #is this right?
+                     max_dia = max(dia),
+                     max_ht = max(ht),
+                     ht_95 = quantile(ht, .95) / 3.28 #convert to meters
+                     )
   
   return(plot_age_dia)
   }
-  
-  
-  # plot(plot_age_dia$mean_age[1:10000] ~ plot_age_dia$weighted_mean_diam[1:10000],
-  #      # ylim = c(0, 250),
-  #      xlab = "Weighted mean diam (inches)",
-  #      ylab = "Mean age (weighted by biomass)")
-  # plot(plot_age_dia$mean_age[1:10000] ~ plot_age_dia$qmd[1:10000],
-  #      # ylim = c(0, 250),
-  #      xlab = "QMD (inches)",
-  #      ylab = "Mean age (weighted by biomass)")
-  # 
-  # plot(plot_age_dia$weighted_mean_diam[1:10000] ~ plot_age_dia$mean_age[1:10000],
-  #      # ylim = c(0, 250),
-  #     ylab = "QMD (inches)",
-  #      xlab = "Mean age (weighted by biomass)")
-  # 
-  # # some test values from the crosswalk table
-  # # not too far off from crosswalk
-  # abline(v = 6, col = "dark gray")
-  # abline(h = 30, col = "dark gray")
-  # abline(v = 11, col = "dark gray")
-  # abline(h = 70, col = "dark gray")
-  # abline(v = 24, col = "dark gray")
-  # abline(h = 120, col = "dark gray")
-  # 
-  # text(x = 4, y = 20, labels = "Class 3 start")
-  # text(x = 10, y = 90, labels = "Class 4 start")
-  # text(x = 26, y = 100, labels = "Class 5 start")
-  # 
-  # # plot(plot_age_dia$qmd[1:10000] ~ plot_age_dia$weighted_mean_diam[1:10000])
-  # # abline(0,1)
-  # # plot(plot_age_dia$max_dia[1:10000] ~ plot_age_dia$qmd[1:10000])
-  # # abline(0,1)
-  
-#*******************************************************************************
-#* Write seral stage raster
-#
-create_seral_stage_raster <- function(output_folder, 
-                                      comm_matrix, 
-                                      comm_raster,
-                                      file_prefix = "",
-                                      timestep,
-                                      class = TRUE){
-  dia_breaks <- c(0,1,6,11,24,1000)
-  comm_matrix$seral_class <- cut(comm_matrix$weighted_mean_diam, dia_breaks, labels = FALSE)
-  # hist(comm_matrix$seral_class)
-  
-  if(class == TRUE){
-    message("   Writing seral class raster to ", paste0(output_folder, file_prefix, "seral_class-", timestep, ".tif"))
-    seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "seral_class")]) %>%
-      terra::clamp(upper = 5, values = FALSE) 
-    writeRaster(seral_raster, paste(output_folder, file_prefix, "seral_class-", timestep, ".tif"), overwrite = TRUE)
-    message("   Done writing seral stage raster")
-  } else if(class == FALSE){
-    message("   Writing mean diameter raster to ", paste0(output_folder, file_prefix, "mean_diameter-", timestep, ".tif"))
-    seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "weighted_mean_diam")]) %>%
-      terra::clamp(upper = 5, values = FALSE) 
-    writeRaster(seral_raster, paste(output_folder, file_prefix, "seral_class-", timestep, ".tif"), overwrite = TRUE)
-    message("   Done writing mean diameter raster")
-  }
-  
-  
-
-}
 
 
 #*******************************************************************************
@@ -421,10 +346,10 @@ create_lai_raster <- function(output_folder,
                               lai_name
                               ){
   message("   Writing LAI raster for ", lai_name, " to ", 
-          paste0(output_folder, file_prefix, "cc_class-", lai_name, "-", timestep, ".tif"))
+          paste0(output_folder, file_prefix, lai_name, "-", timestep, ".tif"))
   lai_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", lai_name)]) %>%
-    terra::clamp(lower = 0, upper = 1, values = FALSE)
-  writeRaster(lai_raster, paste0(output_folder, file_prefix, "cc_class-", lai_name, "-", timestep, ".tif"), overwrite = TRUE)
+    terra::clamp(lower = min(comm_matrix[[lai_name]], na.rm = TRUE), upper = max(comm_matrix[[lai_name]], na.rm = TRUE), values = FALSE)
+  writeRaster(lai_raster, paste0(output_folder, file_prefix, lai_name, "-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing LAI raster")
 }
 
@@ -453,10 +378,7 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
     project_to_template(template)
   NAflag(comm_raster) <- NaN
   values(comm_raster)[values(comm_raster) == 0] <- NaN
-  
-  
-  
-  
+
   #make the community matrix and wrangle some
   
   comm <- read.csv(comm_table) %>%
@@ -523,9 +445,11 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
   
   #used to improve estimates of canopy cover
   
-  plot_age_dia <- calculate_ages_and_dias(comm = comm, 
-                                          dia_regression_rds_loc = "linear_models_diam_from_age.RDS",
-                                          dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS")
+  plot_age_dia <- calculate_age_ht_dia(comm = comm, 
+                                       dia_regression_rds_loc = "linear_models_diam_from_age.RDS",
+                                       dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS",
+                                       ht_regression_rds_loc = "linear_models_ht_from_age.RDS",
+                                       ht_regression_rds_no_sp_loc = "linear_models_ht_from_age_no_sp.RDS")
   
   comm_matrix <- left_join(comm_matrix, plot_age_dia, by = "MapCode")
   
@@ -548,8 +472,6 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
   # LAI -- split by overstory and understory
   #*******************************************************************************
 
-  #TODO fix for proper folder
-  #what timesteps exist for the NECN outputs?
   necn_folder <- paste0(landis_folder, "NECN/")
   lai_files <- list.files(necn_folder, pattern = "LAI")
   lai_files <- gsub("-", "", lai_files)
@@ -591,6 +513,17 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
                     timestep = timestep,
                     lai_name = "LAI_tree")
   
+  #*****************************************************************************
+  #* Write Canopy height raster
+  #*****************************************************************************
+  
+  message("   Writing canopy height raster to ", paste0(output_folder, prefix, "can_ht-", timestep, ".tif"))
+  ht_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "ht_95")]) %>%
+    terra::clamp(lower = min(unique(comm_matrix$ht_95)), 
+                 upper = max(unique(comm_matrix$ht_95)), 
+                 values = FALSE)
+  writeRaster(ht_raster, paste(output_folder, prefix, "can-ht-", timestep, ".tif"), overwrite = TRUE)
+  message("   Done writing height raster")
   
   #*******************************************************************************
   #* Create CWHR DHSVM Codes
