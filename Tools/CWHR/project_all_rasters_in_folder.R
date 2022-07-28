@@ -1,0 +1,34 @@
+library("terra")
+library("tidyverse")
+
+in_folder <- "E:/TCSI LANDIS/CWHR_outputs2/"
+out_folder <- "E:/TCSI LANDIS/CWHR_outputs2_projected/"
+
+project_to_template <- function(input_raster, template){
+  #function to project landis input rasters with no CRS to an input file
+  
+  #replace values of template with values from input raster
+  out_raster <- template %>%
+    `values<-`(values(input_raster))
+  
+  
+  return(out_raster)
+}
+
+
+template <- raster("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Inputs/masks_boundaries/mask.tif")
+
+raster_list <- list.files(in_folder, pattern = ".tif")
+# raster_list <- raster_list[extension(raster_list) %in% c(".img", ".tif")]
+
+rasters_stripped <- sub('\\..*$', '', basename(raster_list))
+
+for(i in 1:length(raster_list)){
+  oldrast <- raster(paste0(in_folder, raster_list[i]))
+  newrast <- project_to_template(oldrast, template)
+  writeRaster(newrast, 
+              paste0(out_folder,rasters_stripped[i], ".tif"),
+              filetype = "GEOTiff",
+              datatype = dataType(oldrast),
+              overwrite = TRUE)
+}

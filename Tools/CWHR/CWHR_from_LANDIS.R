@@ -21,8 +21,20 @@
 library("tidyverse")
 library("terra")
 library("earth") #needed for the regression model predictions -- change if you're using lme4, randomForest, etc.
+library("doSNOW") #to do the parallel processing
 
 source("LANDIS_CWHR_functions.R") #this is the meat of how this works
+
+#template raster with projection to project LANDIS outputs to
+template <- terra::rast("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Inputs/masks_boundaries/mask.tif")
+
+#habitat suitability reference to limit which CWHR codes are used
+#This should just be a vector of CWHR IDs in ascending order
+HS_reference = read.csv("TCSI_Spp_suitability_values_1_28_2021.csv") %>%
+  dplyr::select(CWHR_ID) %>%
+  unlist() %>%
+  as.numeric() %>%
+  sort()
 
 #where are the regressions to relate age to diameter and biomass to canopy cover?
 can_regresison_rds_loc <- "canopy_cover_with_CWR_type_lm.RDS"
@@ -36,7 +48,7 @@ landis_folders <- list.dirs("E:/TCSI LANDIS", recursive = FALSE)
 landis_folders <- paste0(landis_folders[grep("Scenario", landis_folders)], "/")
 
 #where should the outpuits go?
-output_folder <- "E:/TCSI LANDIS/CWHR_outputs/"
+output_folder <- "E:/TCSI LANDIS/CWHR_outputs2/"
 
 #Combinations of timesteps and landis runs
 input_mods_times <- expand.grid(landis_folders, timesteps) %>%
@@ -45,7 +57,8 @@ input_mods_times <- expand.grid(landis_folders, timesteps) %>%
 
 error_list <- data.frame(landis_folder = character(0), timestep = numeric(0), iter = numeric(0))
 
-for(i in 1:nrow(input_mods_times)){
+for(i in 1:nrow(input_mods_times)) {
+  
   timestep <- input_mods_times[i, "timestep"]
   landis_folder <- as.character(input_mods_times[i, "landis_folder"])
   
@@ -55,7 +68,7 @@ for(i in 1:nrow(input_mods_times)){
   
   error_flag <- FALSE
   
-  start <- Sys.time()
+  
   tryCatch(
     {
       process_CWHR_and_write_rasters(landis_folder = landis_folder,
@@ -66,6 +79,8 @@ for(i in 1:nrow(input_mods_times)){
                                      dia_regression_rds_no_sp_loc = dia_regression_rds_no_sp_loc,
                                      can_regresison_rds_loc = can_regresison_rds_loc,
                                      can_regression_rds_no_sp_loc = can_regression_rds_no_sp_loc,
+                                     template = template,
+                                     HS_reference = HS_reference,
                                      class = TRUE)
     },
     error = function(cond) {
@@ -81,9 +96,4 @@ for(i in 1:nrow(input_mods_times)){
     error_list <- rbind(error_list, cbind(landis_folder, timestep, i))
     next()
   } 
-
-  
-  end <- Sys.time()
-  end - start
-
 }
