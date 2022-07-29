@@ -18,7 +18,7 @@ project_to_template <- function(input_raster, template){
 template <- raster("mask.tif")
 
 raster_list <- list.files(in_folder, pattern = ".tif")
-raster_list <- raster_list[!grepl("CWHR_ID", raster_list)]
+#raster_list <- raster_list[!grepl("CWHR_ID", raster_list)]
 # raster_list <- raster_list[extension(raster_list) %in% c(".img", ".tif")]
 
 rasters_stripped <- sub('\\..*$', '', basename(raster_list))
