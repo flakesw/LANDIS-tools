@@ -5,7 +5,7 @@ library(tidyr)
 
 ## in/out dirs
 
-filepath1 <- "E:/TCSI LANDIS/CWHR_outputs2_projected/" ###file were cwhr tiffs live
+filepath1 <- "E:/TCSI LANDIS/CWHR_outputs2/" ###file were cwhr tiffs live
 out.dir <- "E:/TCSI LANDIS/CWHR_outputs_HS/"###empty file for output
 
 ###TCSI_SPP_suitability... csv with habitat suitability values for all species organized by cover type
@@ -33,8 +33,7 @@ foreach(i = 1:length(species),
         .verbose=T, 
         .packages = "raster",
         .options.snow = opts) %dopar% {
-  
-  library(raster)
+
   
   sp <- species[i]
   
