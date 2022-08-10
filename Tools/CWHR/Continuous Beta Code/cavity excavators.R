@@ -1,3 +1,5 @@
+starttime <- Sys.time()
+
 library(rgdal)
 library(rgeos)
 library(picante)
@@ -7,6 +9,8 @@ library(raster)
 library(terra)
 library(dplyr)
 library(sf)
+
+#this code is midway through revision
 
 
 ##Copy and paste beta diversity function. This chunk of code sets up the function to be used later on.
@@ -42,13 +46,15 @@ fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
 scenarios<-list.dirs(in.dir, recursive = F)
 
 # Assign output directory
-out.dir<-"E:/TCSI LANDIS/CWHR_diversity"
+out.dir<-"./test2"
 
 
 
 ##This loop rolls through each folder and modifies suitability rasters for all species to a format
 ##which the betagrid function can work with and sets up a polygon to write results into
-for (i in 1:length(scenarios)){
+for (i in 1){
+  
+
   #grab all files in a folder
   grids <- list.files(scenarios[i] , pattern = "*.tif$")
   
@@ -58,7 +64,7 @@ for (i in 1:length(scenarios)){
 
   # binarize each raster in stack and subset to seed dispersers
   fg <- fnlg$Cavity_excavators 
-  fg <- fg[fg!= ""]
+  fg <- fg[fg != ""]
   
   cgridstack <- raster::subset(my_stack, grep(paste(fg, collapse="|"), grids))
   
@@ -92,7 +98,6 @@ for (i in 1:length(scenarios)){
   poly2$betadiv <- results[,3]
   emptyraster <- terra::rast(ext(vect(poly2)), resolution = 180, crs = crs(poly2))
   beta <- terra::rasterize(vect(poly2), field="betadiv", emptyraster) #terra is much faster at rasterizing
-  beta <- rasterize(poly2, field="betadiv", emptyraster)
   
   terra::writeRaster(beta, paste0(out.dir,gsub(in.dir,"",scenarios[i]),"_cavityexcavators_540_nestedness"), filetype="GTiff")
   
@@ -103,5 +108,7 @@ for (i in 1:length(scenarios)){
   
   terra::writeRaster(beta, paste0(out.dir,gsub(in.dir,"",scenarios[i]),"_cavityexcavators_540_meanbeta"), filetype="GTiff")
 
-}
 
+}
+endtime <- Sys.time()
+elapsed <- endtime - starttime

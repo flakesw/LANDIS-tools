@@ -1,3 +1,5 @@
+starttime <- Sys.time()
+
 library(rgdal)
 library(rgeos)
 library(picante)
@@ -6,6 +8,7 @@ library(CommEcol)
 library(raster)
 library(terra)
 
+#original code pre-revision
 
 ##Copy and paste beta diversity function. This chunk of code sets up the function to be used later on.
 
@@ -34,16 +37,16 @@ betagrid<-function(gridshp, comp, xfeature, yfeature, radius, phylotree, phylobe
 
 
 ## Assign input directory. This directory leads to all the CWHR suitability rasters for all species for all time steps
-in.dir<- "C:/Users/User/Documents/Postdoc/Beta Diversity/out/CWHR Species Suitability Rasters/Scenario1/MIROC/"
+in.dir<- "E:/TCSI LANDIS/CWHR_outputs_HS/"
 
 # read in csv with species codes for functional groups
-fnlg<-read.csv("C:/Users/User/Documents/Postdoc/TCSI Blueprint Project/Functional_Groups_v3.csv")
+fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
 
 # For each folder/scenario going into the loop
 scenarios<-list.dirs(in.dir, recursive = F)
 
 # Assign output directory
-out.dir<-"C:/Users/User/Documents/Postdoc/Beta Diversity/out/Beta Functional Group Output/MIROC/herbivores/"
+out.dir <- "./test"
 
 
 
@@ -51,7 +54,7 @@ out.dir<-"C:/Users/User/Documents/Postdoc/Beta Diversity/out/Beta Functional Gro
 ##which the betagrid function can work with and sets up a polygon to write results into
 
 
-for (i in 1:length(scenarios)){
+for (i in 1){ #change back
   #grab all files in a folder
   grids <- list.files(scenarios[i] , pattern = "*.tif$")
   
@@ -61,7 +64,7 @@ for (i in 1:length(scenarios)){
 
   
   # binarize each raster in stack and subset to seed dispersers
-  herbs<-pmatch(fnlg$Herbivores,grids)
+  herbs<-pmatch(fnlg$Cavity_excavators,grids) #change back
   herbs<-herbs[!is.na(herbs)]
   hgrids<-grids[herbs]
   hgrids<-gsub("\\..*","",hgrids)
@@ -76,7 +79,7 @@ occurrences$latitude<-occurrences$y
 df <- subset(occurrences, select=c(x,y,id,longitude,latitude))
 b <- rasterFromXYZ(df,res=c(180,180))
 poly<-rasterToPolygons(b,dissolve=FALSE)
-newdata <- occurrences[c(3:99)]
+newdata <- occurrences[c(3:ncol(occurrences)-3)] #change back
 poly2<-poly
 crs(poly2)<-""
 crs(poly2)
@@ -112,4 +115,7 @@ beta <- rasterize(poly2, field="betadiv", emptyraster)
 writeRaster(beta, paste0(out.dir,gsub(in.dir,"",scenarios[i]),"_herbivores_540_meanbeta"), format="GTiff")
 
 }
+
+endtime <- Sys.time()
+elapsed <- endtime - starttime
 
