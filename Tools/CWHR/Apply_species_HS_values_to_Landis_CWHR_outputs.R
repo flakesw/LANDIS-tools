@@ -8,8 +8,8 @@ library(tidyr)
 
 ## in/out dirs
 
-filepath1 <- "E:/TCSI LANDIS/CWHR_outputs2/" ###file were cwhr tiffs live
-out.dir <- "E:/TCSI LANDIS/CWHR_outputs_HS2/"###empty file for output
+filepath1 <- "E:/TCSI LANDIS/CWHR/cwhr_outputs_vegetation_new2/" ###file were cwhr tiffs live
+out.dir <- "E:/TCSI LANDIS/CWHR/CWHR_outputs_species_suitability_new/"###empty file for output
 
 ###TCSI_SPP_suitability... csv with habitat suitability values for all species organized by cover type
 coefs <- read.csv("TCSI_Spp_suitability_values_1_28_2021.csv", sep=",", header=TRUE)

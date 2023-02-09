@@ -39,7 +39,7 @@ betagrid<-function(gridstack, radius, phylotree, phylobeta=F, index="sorensen"){
 
 
 ## Assign input directory. This directory leads to all the CWHR suitability rasters for all species for all time steps
-in.dir<- "E:/TCSI LANDIS/CWHR_outputs_HS/"
+in.dir<- "E:/TCSI LANDIS/CWHR/CWHR_outputs_species_suitability_new/"
 
 # read in csv with species codes for functional groups
 fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
@@ -48,7 +48,7 @@ fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
 scenarios<-list.dirs(in.dir, recursive = F)
 
 # Assign output directory
-out.dir<-"E:/TCSI LANDIS/CWHR_diversity"
+out.dir<-"E:/TCSI LANDIS/CWHR/CWHR_diversity_new"
 
 
 cl <- makeCluster(6)

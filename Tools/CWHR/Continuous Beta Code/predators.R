@@ -39,7 +39,7 @@ betagrid<-function(gridstack, radius, phylotree, phylobeta=F, index="sorensen"){
 
 
 ## Assign input directory. This directory leads to all the CWHR suitability rasters for all species for all time steps
-in.dir<- "E:/TCSI LANDIS/CWHR_outputs_HS/"
+in.dir<- "E:/TCSI LANDIS/CWHR/CWHR_outputs_species_suitability_new/"
 
 # read in csv with species codes for functional groups
 fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
@@ -48,10 +48,11 @@ fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
 scenarios<-list.dirs(in.dir, recursive = F)
 
 # Assign output directory
-out.dir<-"E:/TCSI LANDIS/CWHR_diversity"
+out.dir<-"E:/TCSI LANDIS/CWHR/CWHR_diversity_new"
 
+# scenarios <- scenarios[c(281, 289, 264) ]
 
-cl <- makeCluster(6)
+cl <- makeCluster(3)
 registerDoSNOW(cl)
 iterations <- length(scenarios)
 pb <- txtProgressBar(max = iterations, style = 3)
@@ -89,18 +90,18 @@ foreach(i = 1:length(scenarios),
   ##Extract the turnover result and write/export to a raster
   r <- emptyraster
   r[results$cell] <- results$mean_turnover
-  terra::writeRaster(r, paste0(out.dir, gsub(in.dir,"",scenarios[i]),"_predators_540_turnover"), filetype="GTiff")
+  terra::writeRaster(r, paste0(out.dir, gsub(in.dir,"",scenarios[i]),"_predators_540_turnover.tif"), filetype="GTiff")
   
   ##Extract the turnover result and write/export to a raster
   r <- emptyraster
   r[results$cell] <- results$mean_nestedness
-  terra::writeRaster(r, paste0(out.dir, gsub(in.dir,"",scenarios[i]),"_predators_540_nestedness"), filetype="GTiff")
+  terra::writeRaster(r, paste0(out.dir, gsub(in.dir,"",scenarios[i]),"_predators_540_nestedness.tif"), filetype="GTiff")
 
   
   ##Extract the mean beta result and write/export to a raster
   r <- emptyraster
   r[results$cell] <- results$mean_beta
-  terra::writeRaster(r, paste0(out.dir, gsub(in.dir,"",scenarios[i]),"_predators_540_beta"), filetype="GTiff")
+  terra::writeRaster(r, paste0(out.dir, gsub(in.dir,"",scenarios[i]),"_predators_540_beta.tif"), filetype="GTiff")
   
   return(NULL)
   

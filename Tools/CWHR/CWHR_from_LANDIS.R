@@ -26,7 +26,7 @@ library("doSNOW") #to do the parallel processing
 source("LANDIS_CWHR_functions.R") #this is the meat of how this works
 
 #template raster with projection to project LANDIS outputs to
-template <- terra::rast("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Inputs/masks_boundaries/mask.tif")
+template <- terra::rast("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Inputs/masks_boundaries/mask_9311_new.tif")
 
 #habitat suitability reference to limit which CWHR codes are used
 #This should just be a vector of CWHR IDs in ascending order
@@ -44,11 +44,14 @@ dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS"
 
 #What models and timesteps to use?
 timesteps <- seq(0, 80, by = 10)
-landis_folders <- list.dirs("E:/TCSI LANDIS", recursive = FALSE)
+landis_folders <- list.dirs("E:/TCSI LANDIS/LANDIS runs", recursive = FALSE)
 landis_folders <- paste0(landis_folders[grep("Scenario", landis_folders)], "/")
 
+#xx remove
+landis_folders <- landis_folders[86:88]
+
 #where should the outpuits go?
-output_folder <- "E:/TCSI LANDIS/CWHR_outputs2/"
+output_folder <- "E:/TCSI LANDIS/CWHR/cwhr_new_outputs/"
 
 #Combinations of timesteps and landis runs
 input_mods_times <- expand.grid(landis_folders, timesteps) %>%
@@ -63,7 +66,8 @@ for(i in 1:nrow(input_mods_times)) {
   landis_folder <- as.character(input_mods_times[i, "landis_folder"])
   
   #how should the outputs be named? Timestep and layer name are automatically added
-  scenario_name <- paste0(strsplit(landis_folder, "/")[[1]][[3]], " - ")
+  #Follows format "Scenario# - climate - Run # - "
+  scenario_name <- paste0(strsplit(landis_folder, "/")[[1]][[4]], " - ")
   
   
   error_flag <- FALSE

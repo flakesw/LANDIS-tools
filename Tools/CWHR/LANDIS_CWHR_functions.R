@@ -228,7 +228,7 @@ create_forest_type_raster <- function(output_folder,
   forest_types2$CWHR_type <- as.integer(forest_types2$CWHR_type)
   
   message("   Writing forest type raster to ", paste0(output_folder, file_prefix, "forest_type-", timestep, ".tif"))
-  forest_raster <- terra::classify(comm_raster, rcl = forest_types2[, c("MapCode", "CWHR_type")], othersNA = TRUE) %>%
+  forest_raster <- terra::classify(comm_raster, rcl = forest_types2[, c("MapCode", "CWHR_type")], others = NA) %>%
     terra::clamp(upper = max(as.integer(class_table$num)), values = FALSE) #if any MapCodes aren't reclassified, replace with NA
   
   # plot(forest_raster)
@@ -375,13 +375,13 @@ create_seral_stage_raster <- function(output_folder,
   
   if(class == TRUE){
     message("   Writing seral class raster to ", paste0(output_folder, file_prefix, "seral_class-", timestep, ".tif"))
-    seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "seral_class")], othersNA = TRUE) %>%
+    seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "seral_class")], others = NA) %>%
       terra::clamp(upper = 5, values = FALSE) 
     writeRaster(seral_raster, paste0(output_folder, file_prefix, "seral_class-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing seral stage raster")
   } else if(class == FALSE){
     message("   Writing mean diameter raster to ", paste0(output_folder, file_prefix, "mean_diameter-", timestep, ".tif"))
-    seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "weighted_mean_diam")], othersNA = TRUE) %>%
+    seral_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "weighted_mean_diam")], others = NA) %>%
       terra::clamp(upper = 200, values = FALSE) 
     writeRaster(seral_raster, paste0(output_folder, file_prefix, "mean_diameter-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing mean diameter raster")
@@ -447,13 +447,13 @@ create_canopy_cover_raster <- function(output_folder,
 
   if(class == TRUE){
     message("   Writing canopy cover class raster to ", paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"))
-    cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc_class")], othersNA = TRUE) %>%
+    cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc_class")], others = NA) %>%
       terra::clamp(lower = 0, upper = 4, values = FALSE)
     writeRaster(cc_raster, paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing canopy cover class raster")
   } else if(class == FALSE){
     message("   Writing canopy cover continuous values raster to ", paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"))
-    cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc")], othersNA = TRUE) %>%
+    cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc")], others = NA) %>%
       terra::clamp(lower = 0, upper = 1, values = FALSE)
     writeRaster(cc_raster, paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing canopy cover continuous values raster")
@@ -629,7 +629,7 @@ process_CWHR_and_write_rasters <- function(landis_folder,
   }
   
   message("   Writing CWHR ID raster to ", paste0(output_folder, prefix, "CWHR_ID-", timestep, ".tif"))
-  cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "CWHR_code")], othersNA = TRUE)
+  cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "CWHR_code")], others = NA)
   writeRaster(cwhr_raster, paste0(output_folder, prefix, "CWHR_ID-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing CWHR ID raster")
   

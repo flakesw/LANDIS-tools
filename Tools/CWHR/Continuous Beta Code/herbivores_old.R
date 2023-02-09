@@ -34,7 +34,7 @@ betagrid<-function(gridshp, comp, xfeature, yfeature, radius, phylotree, phylobe
 
 
 ## Assign input directory. This directory leads to all the CWHR suitability rasters for all species for all time steps
-in.dir<- "E:/TCSI LANDIS/CWHR_outputs_HS/"
+in.dir<- "E:/TCSI LANDIS/CWHR/CWHR_outputs_species_suitability/"
 
 # read in csv with species codes for functional groups
 fnlg<-read.csv("./Continuous Beta Code/Functional_Groups_v3.csv")
@@ -85,12 +85,12 @@ results_test <- betagrid(gridshp=poly2, comp=newdata, xfeature=2, yfeature=3, ra
 ##summary(results)
 
 ##Extract the turnover result and write/export to a raster
-poly2$betadiv <- results[,2]
+poly2$betadiv <- results_test[,2]
 emptyraster <- raster(extent(poly2))
 res(emptyraster)=180
 beta <- rasterize(poly2, field="betadiv", emptyraster)
   
-writeRaster(beta, paste0(out.dir,gsub(in.dir,"",scenarios[i]),"_herbivores_540_turnover"), format="GTiff")
+writeRaster(beta, paste0(gsub(in.dir,"",scenarios[i]),"_herbivores_540_turnover"), format="GTiff")
 
 ##Extract the nestedness result and write/export to a raster
 poly2$betadiv <- results[,3]
@@ -101,12 +101,12 @@ beta <- rasterize(poly2, field="betadiv", emptyraster)
 writeRaster(beta, paste0(out.dir,gsub(in.dir,"",scenarios[i]),"_herbivores_540_nestedness"), format="GTiff")
 
 ##Extract the mean beta result and write/export to a raster
-poly2$betadiv <- results[,4]
+poly2$betadiv <- results_test[,4]
 emptyraster <- raster(extent(poly2))
 res(emptyraster)=180
 beta <- rasterize(poly2, field="betadiv", emptyraster)
 
-writeRaster(beta, paste0(out.dir,gsub(in.dir,"",scenarios[i]),"_herbivores_540_meanbeta"), format="GTiff")
+raster::writeRaster(beta, paste0(basename(scenarios[i]),"_herbivores_540_meanbeta.tif"), format="GTiff")
 
 }
 

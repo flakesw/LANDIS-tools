@@ -1,8 +1,8 @@
 library("raster")
 library("tidyverse")
 
-in_folder <- "E:/TCSI LANDIS/CWHR_outputs/"
-out_folder <- "E:/TCSI LANDIS/CWHR_outputs2/"
+in_folder <- "E:/TCSI LANDIS/CWHR/CWHR_diversity_new/"
+out_folder <- "E:/TCSI LANDIS/CWHR/CWHR_diversity_new_reprojected/"
 
 project_to_template <- function(input_raster, template){
   #function to project landis input rasters with no CRS to an input file
@@ -15,11 +15,11 @@ project_to_template <- function(input_raster, template){
 }
 
 
-template <- raster("mask.tif")
+template <- raster("mask_9311.tif")
 
 raster_list <- list.files(in_folder, pattern = ".tif")
-#raster_list <- raster_list[!grepl("CWHR_ID", raster_list)]
-# raster_list <- raster_list[extension(raster_list) %in% c(".img", ".tif")]
+# raster_list <- raster_list[!grepl("CWHR_ID", raster_list)]
+raster_list <- raster_list[extension(raster_list) %in% c(".img", ".tif")]
 
 rasters_stripped <- sub('\\..*$', '', basename(raster_list))
 
@@ -50,3 +50,4 @@ foreach(i = 1:length(raster_list),
   
   return(NULL)
 }
+
