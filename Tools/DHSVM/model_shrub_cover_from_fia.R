@@ -186,7 +186,7 @@ tree_summary <- fia_trees %>%
                    plot_qmd = sqrt((plot_bapa/plot_tpa)/0.005454),
                    plot_sdi = plot_tpa * ((plot_qmd/10)^(-1.605)),
                    sum_sdi = sum(TPA_UNADJ * ((DIA/10)^(-1.605))),
-                   biomass = sum(DRYBIO_TOTAL * TPA_UNADJ) / 892, #convert to megagrams per ha
+                   biomass = sum(DRYBIO_TOTAL * TPA_UNADJ) * 2.471, #convert to megagrams per ha
                    mean_age = mean(TOTAGE, na.rm = TRUE),
                    high_age = quantile(TOTAGE, 0.9, na.rm = TRUE),
                    .groups = "keep")
