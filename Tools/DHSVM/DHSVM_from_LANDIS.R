@@ -5,6 +5,7 @@
 #   1. Classify forest type
 #   2. Estimate stand seral stage
 #   3. Estimate canopy cover
+#   4. Estimate shrub cover to decide where understory exists
 
 # Inputs:
 # Folder with landis model run
@@ -13,6 +14,7 @@
 # .RDS file with model to predict CC
 # .RDS file with models to convert AGE -> DIA
 # .RDS file with models to convert AGE -> HT
+# .RDS file to model to predict shrub cover
 
 # Outputs:
 # Forest type raster
@@ -31,6 +33,7 @@ can_regresison_rds_loc <- "canopy_cover_with_CWR_type_lm.RDS"
 can_regression_rds_no_sp_loc <- "canopy_cover_without_CWR_type_lm.RDS"
 dia_regression_rds_loc = "linear_models_diam_from_age.RDS"
 dia_regression_rds_no_sp_loc = "linear_models_diam_from_age_no_sp.RDS"
+shrub_regression = "beta_model_shrub_cover.RDS"
 
 #What models and timesteps to use?
 timesteps <- seq(0, 80, by = 10)
