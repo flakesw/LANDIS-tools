@@ -297,6 +297,7 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
                                            dia_regression_rds_no_sp_loc,
                                            can_regresison_rds_loc,
                                            can_regression_rds_no_sp_loc,
+                                           shrub_regression_loc,
                                            class = FALSE){
   
   message(paste0("Beginning processing LANDIS run ", landis_folder))
@@ -391,23 +392,26 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
                                            can_regresison_rds_loc = "canopy_cover_with_CWR_type_lm.RDS",
                                            can_regression_rds_no_sp_loc = "canopy_cover_without_CWR_type_lm.RDS")
 
-  # create_canopy_cover_raster(output_folder = output_folder,
-  #                            comm_matrix = comm_matrix,
-  #                            comm_raster = comm_raster,
-  #                            file_prefix = prefix,
-  #                            timestep = timestep,
-  #                            class = FALSE
-  # )
+  create_canopy_cover_raster(output_folder = output_folder,
+                             comm_matrix = comm_matrix,
+                             comm_raster = comm_raster,
+                             file_prefix = prefix,
+                             timestep = timestep,
+                             class = FALSE
+  )
   
   #*******************************************************************************
   #* Estimate shrub cover
   #*******************************************************************************
   shrub_model <- readRDS(shrub_regression_loc)
-  comm_matrix$shrub_cover <- predict(shrub_model, newdata = list(biomass = comm_matrix$total_biomass,
+  cwhr_update <- ifelse(comm_matrix$CWHR_type == "mri", "mhc", comm_matrix$CWHR_type)
+  
+  comm_matrix$shrub_cover <- predict(shrub_model, newdata = data.frame(biomass = comm_matrix$total_biomass,
                                                                  cc = comm_matrix$cc,
                                                                  mean_age = comm_matrix$mean_age_unweighted,
-                                                                 CWHR_type = comm_matrix$CWHR_type))
+                                                                 CWHR_type = cwhr_update))
 
+  
   #*******************************************************************************
   # LAI -- split by overstory and understory
   #*******************************************************************************
@@ -440,51 +444,39 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
   comm_matrix$LAI_shrub <- comm_matrix$LAI*comm_matrix$shrub_proportion #assign LAI weighted by biomass
   comm_matrix$LAI_tree <- comm_matrix$LAI*comm_matrix$overstory_proportion
 
-  # create_lai_raster(output_folder = output_folder,
-  #                   comm_matrix = comm_matrix,
-  #                   comm_raster = comm_raster,
-  #                   file_prefix = scenario_name,
-  #                   timestep = timestep,
-  #                   lai_name = "LAI_shrub")
-  # create_lai_raster(output_folder = output_folder,
-  #                   comm_matrix = comm_matrix,
-  #                   comm_raster = comm_raster,
-  #                   file_prefix = scenario_name,
-  #                   timestep = timestep,
-  #                   lai_name = "LAI_tree")
+  create_lai_raster(output_folder = output_folder,
+                    comm_matrix = comm_matrix,
+                    comm_raster = comm_raster,
+                    file_prefix = scenario_name,
+                    timestep = timestep,
+                    lai_name = "LAI_shrub")
+  create_lai_raster(output_folder = output_folder,
+                    comm_matrix = comm_matrix,
+                    comm_raster = comm_raster,
+                    file_prefix = scenario_name,
+                    timestep = timestep,
+                    lai_name = "LAI_tree")
 
-  #*****************************************************************************
-  #* Write Canopy height raster
-  #*****************************************************************************
-  # 
-  # message("   Writing canopy height raster to ", paste0(output_folder, prefix, "can_ht-", timestep, ".tif"))
-  # ht_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "ht_95")]) %>%
-  #   terra::clamp(lower = min(unique(comm_matrix$ht_95)), 
-  #                upper = max(unique(comm_matrix$ht_95)), 
-  #                values = FALSE)
-  # writeRaster(ht_raster, paste(output_folder, prefix, "can-ht-", timestep, ".tif"), overwrite = TRUE)
-  # message("   Done writing height raster")
-  # 
   #*******************************************************************************
   #* Create CWHR DHSVM Codes
   #* **********************************************************************
-  if(exists("HS_reference")){
-    # Check if all the CWHR codes match the allowed types in reference
-    # and replace with valid codes
-
-    comm_matrix <- comm_matrix %>%
-      mutate(in_ref = CWHR_code %in% HS_reference) %>%
-      mutate(CWHR_code = case_when(CWHR_type == "mch" ~ 1400,
-                                   !in_ref & seral_class == 1 ~ as.numeric(paste0(num, seral_class, 0)),
-                                   !in_ref & seral_class > 1 & cc_class == 0 ~ as.numeric(paste0(num, seral_class, 1)),
-                                   TRUE ~ CWHR_code))
-    comm_matrix$in_ref <- comm_matrix$CWHR_code %in% HS_reference
-
-    #are they all fixed now?
-    if(sum(!comm_matrix$in_ref) > 0){
-      message("Some CWHR codes not found in reference (", sum(!comm_matrix$in_ref), " sites)")
-    }
-  }
+  # if(exists("HS_reference")){
+  #   # Check if all the CWHR codes match the allowed types in reference
+  #   # and replace with valid codes
+  # 
+  #   comm_matrix <- comm_matrix %>%
+  #     mutate(in_ref = CWHR_code %in% HS_reference) %>%
+  #     mutate(CWHR_code = case_when(CWHR_type == "mch" ~ 1400,
+  #                                  !in_ref & seral_class == 1 ~ as.numeric(paste0(num, seral_class, 0)),
+  #                                  !in_ref & seral_class > 1 & cc_class == 0 ~ as.numeric(paste0(num, seral_class, 1)),
+  #                                  TRUE ~ CWHR_code))
+  #   comm_matrix$in_ref <- comm_matrix$CWHR_code %in% HS_reference
+  # 
+  #   #are they all fixed now?
+  #   if(sum(!comm_matrix$in_ref) > 0){
+  #     message("Some CWHR codes not found in reference (", sum(!comm_matrix$in_ref), " sites)")
+  #   }
+  # }
   
   reference_types <- paste0(1:14, rep(c("01","02"), each = 14)) #allowable veg type codes
   # comm_bak <- comm_matrix #remove
@@ -495,19 +487,40 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
   
   comm_matrix <- comm_matrix %>% 
     dplyr::inner_join(class_table, by = c("CWHR_type" = "type")) %>%
-    mutate(DHSVM_code = as.numeric(paste0(as.character(num), ifelse(shrub_proportion > 0.01, "02", "01"))))%>%
-    mutate(in_ref = DHSVM_code %in% reference_types) %>%
+    mutate(DHSVM_code = as.numeric(paste0(as.character(num), ifelse(shrub_proportion > 0.01 | shrub_cover > 0.2, "02", "01"))))%>%
+    # mutate(in_ref = DHSVM_code %in% reference_types) %>%
+    mutate(DHSVM_code = case_when(shrub_cover > 0.3 & cc < 0.1 ~ 1402,
+                                  TRUE ~ DHSVM_code)) %>%
     mutate(DHSVM_code = case_when(CWHR_type == "mch" ~ 1402,
                                   # !in_ref ~ NA,
-                                  TRUE ~ DHSVM_code))
+                                  TRUE ~ DHSVM_code)) 
   # table(comm_matrix$CWHR_type)
+  # table(comm_matrix$DHSVM_code)
   
   message("   Writing veg ID raster to ", paste0(output_folder, prefix, "veg-ID-", timestep, ".tif"))
   
-  cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "DHSVM_code")], othersNA = TRUE)
+  cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "DHSVM_code")], others = NA)
   
   writeRaster(cwhr_raster, paste(output_folder, prefix, "veg-ID-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing veg ID raster")
+  
+  
+  #*****************************************************************************
+  #* Write Canopy height raster
+  #*****************************************************************************
+  
+  message("   Writing canopy height raster to ", paste0(output_folder, prefix, "can_ht-", timestep, ".tif"))
+  
+  #set height for chaparral
+  comm_matrix <-  mutate(comm_matrix, ht_95 = case_when(DHSVM_code == 1402 ~ 3,
+                             TRUE ~ ht_95))
+  
+  ht_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "ht_95")]) %>%
+    terra::clamp(lower = min(unique(comm_matrix$ht_95)),
+                 upper = max(unique(comm_matrix$ht_95)),
+                 values = FALSE)
+  writeRaster(ht_raster, paste(output_folder, prefix, "can-ht-", timestep, ".tif"), overwrite = TRUE)
+  message("   Done writing height raster")
   
   gc()
   

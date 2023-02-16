@@ -1,0 +1,659 @@
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>LANDFIRE, Earth Resources Observation and Science Center (EROS), U.S. Geological Survey</origin>
+        <pubdate>20200731</pubdate>
+        <title>LANDFIRE Remap 2016 Existing Vegetation Type (EVT) CONUS</title>
+        <edition>LF Remap</edition>
+        <geoform>raster digital data</geoform>
+        <pubinfo>
+          <pubplace>Sioux Falls, SD</pubplace>
+          <publish>Earth Resources Observation and Science Center (EROS), U.S. Geological Survey</publish>
+        </pubinfo>
+        <onlink>https://www.landfire.gov</onlink>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>LANDFIRE's (LF) Existing Vegetation Type (EVT) represents the current distribution of the terrestrial ecological systems classification developed by NatureServe for the western hemisphere. In this context, a terrestrial ecological system is defined as a group of plant community types that tend to co-occur within landscapes with similar ecological processes, substrates, and/or environmental gradients. EVT also includes ruderal or semi-natural vegetation types within the U.S. National Vegetation Classification [(NVC) http://usnvc.org/]. See the EVT product page (https://www.landfire.gov/evt.php) for more information about ecological systems and NVC. EVT is mapped using decision tree models, field data, Landsat imagery, elevation, and biophysical gradient data. Decision tree models are developed separately for tree, shrub, and herbaceous lifeforms which are then used to produce a lifeform specific EVT product. These models are generated for each Environmental Protection Agency (EPA) Level III Ecoregion (https://www.epa.gov/eco-research/ecoregions). Riparian, alpine, sparse and other site-specific EVTs are constrained by predetermined masks. Urban and developed areas are derived from the National Land Cover Database (NLCD), whereas agricultural lands originate from the Cropland Data Layer (CDL) and Common Land Unit (CLU) database. Developed ruderal classes are identified by combining wildland-urban-interface (WUI) data with population density information from the US Census Bureau. Annual Disturbance products are included to describe areas that have experienced landscape change within the previous 10-year period. EVT is then reconciled through QA/QC measures to ensure lifeform is synchronized with both Existing Vegetation Cover (EVC) and Height (EVH) products.</abstract>
+      <purpose>LF Remap is a comprehensive mapping effort that uses recent data to create a new base map product suite that better represents contemporary conditions. LF Remap represents circa 2016 ground conditions and is designed to produce vegetation, disturbance, and fuels products that inform wildland fire and ecological decision systems. LF Remap has improved past methodologies and processes to incorporate current satellite imagery, contemporary data sources, and the latest software and hardware technologies. Final LF Remap products offer significant improvements to all previous LF versions (read more about versions here https://www.landfire.gov/lf_schedule.php).
+
+LF Remap products are designed to facilitate national and regional level strategic fire and resource management planning and reporting of management activities. The principal purposes of the products include providing, 1) national level, landscape scale geospatial products to support fire and fuels management planning, and 2) consistent fuels products to support fire planning, analysis, and budgeting to evaluate fire management alternatives. 
+
+Products are created at a 30 meter raster; however, the applicability of products varies by location and specific use. LF products were designed to support 1) national (all states) strategic planning, 2) regional (single large states or groups of smaller states), and 3) strategic/tactical planning for large sub regional landscapes and Fire Management Units (FMUs) (such as significant portions of states or multiple federal administrative entities). The applicability of LF products to support fire and land management planning on smaller areas will vary by product, location, and specific use. Managers and planners must evaluate LF products according to the scale and requirements specific to their needs.
+</purpose>
+      <supplinf>none
+</supplinf>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <sngdate>
+          <caldate>2016</caldate>
+        </sngdate>
+      </timeinfo>
+      <current>ground condition</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>Biennially</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-121.2838</westbc>
+        <eastbc>-119.6078</eastbc>
+        <northbc>39.6465</northbc>
+        <southbc>38.0001</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>ISO 19115 Topic Category</themekt>
+        <themekey>imageryBaseMapsEarthCover</themekey>
+        <themekey>biota</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Thesaurus</themekt>
+        <themekey>fires</themekey>
+        <themekey>hazard preparedness</themekey>
+        <themekey>remote sensing</themekey>
+        <themekey>image collections</themekey>
+        <themekey>geospatial datasets</themekey>
+        <themekey>geographic information systems</themekey>
+      </theme>
+      <theme>
+        <themekt>None</themekt>
+        <themekey>raster digital data </themekey>
+        <themekey>Existing Vegetation Type</themekey>
+        <themekey>EVT</themekey>
+        <themekey>U.S. Geological Survey (USGS)</themekey>
+        <themekey>U.S. Forest Service (USFS)</themekey>
+        <themekey>LANDFIRE Remap</themekey>
+        <themekey>LANDFIRE 2016</themekey>
+      </theme>
+      <place>
+        <placekt>Common geographic areas</placekt>
+        <placekey>US</placekey>
+        <placekey>CONUS</placekey>
+        <placekey>United States</placekey>
+        <placekey>Continental U.S.</placekey>
+        <placekey>Conterminous United States</placekey>
+      </place>
+    </keywords>
+    <accconst>None</accconst>
+    <useconst>None </useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>LANDFIRE, Earth Resources Observation and Science Center (EROS), U.S. Geological Survey</cntorg>
+        </cntorgp>
+        <cntpos>Customer Service Representative</cntpos>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>47914 252nd Street</address>
+          <city>Sioux Falls</city>
+          <state>SD</state>
+          <postal>57198</postal>
+          <country>U.S.</country>
+        </cntaddr>
+        <cntvoice>605-594-6151</cntvoice>
+        <cntemail>helpdesk@landfire.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <datacred>These products were created by the LF team at USGS EROS, Sioux Falls, SD. Refer to the contact information throughout this metadata to contact the LF team.</datacred>
+    <secinfo>
+<secsys>None in place</secsys>
+<secclass>Unclassified</secclass>
+<sechandl>If there is ever doubt, contact the LF Help Desk at helpdesk@landfire.gov</sechandl>
+</secinfo>
+    <native>Microsoft Windows 10; ESRI ArcCatalog 10.6.1</native>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>For LF Remap EVT the Auto-Keys process was re-designed. Auto-Keys are used to determine Existing Vegetation Type classification based on plot data in the LF Reference Database (LFRDB). A validation of the EVT product is conducted by comparing the EVT product for a pixel with the Auto-Key EVT assignment for a sample plot contained in that pixel. These agreement assessments have been developed for each LF CONUS GeoArea. To read more about EVT agreement assessments go to https://www.landfire.gov/evt.php</attraccr>
+    </attracc>
+    <logic>The products were pixel "truth" tested for consistency of land or water characteristics across all products. </logic>
+    <complete>Products were formally tested to ensure that valid data was produced for all pixels. Each product was then validated and tested for duplicates, omissions, and errors.</complete>
+    <lineage>
+      <procstep>
+        <procdesc>Beginning in 2016 LF Remap products were created using recent advances in image compositing, tiling algorithms, and faster computing hardware to ensure that LF products remained relevant. LF Remap leveraged the Landsat archive, lidar data, and user contributed field plot data compiled into the LF Reference Database (LFRDB), to create new base map vegetation products. Reference resources included, but were not limited to, Forest Inventory and Analysis (FIA) program plot data (USFS https://fia.fs.fed.us/), Landsat Dynamic Surface Water Extent [(DSWE) USGS https://www.usgs.gov/land-resources/nli/landsat/], the National Land Cover Dataset [(NLCD) USGS https://www.mrlc.gov/data], and National Agricultural Statistics Service [(NASS) USDA - https://www.nass.usda.gov/]. To read more about LF reference resources go to https://www.landfire.gov/reference.php. Information about LF Remap product testing is available by request or via the website at https://www.landfire.gov.</procdesc>
+        <procdate>20200731</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <spdoinfo>
+    <direct>Raster</direct>
+    <rastinfo>
+      <rasttype>Grid Cell</rasttype>
+      <rowcount>20729</rowcount>
+      <colcount>24853</colcount>
+    </rastinfo>
+  </spdoinfo>
+  <spref>
+    <horizsys>
+      <planar>
+        <mapproj>
+          <mapprojn>Albers Conical Equal Area</mapprojn>
+          <albers>
+            <stdparll>29.5</stdparll>
+            <stdparll>45.5</stdparll>
+            <longcm>-96.0</longcm>
+            <latprjo>23.0</latprjo>
+            <feast>0</feast>
+            <fnorth>0</fnorth>
+          </albers>
+        </mapproj>
+        <planci>
+          <plance>row and column</plance>
+          <coordrep>
+            <absres>30</absres>
+            <ordres>30</ordres>
+          </coordrep>
+          <plandu>meters</plandu>
+        </planci>
+      </planar>
+      <geodetic>
+        <horizdn>North American Datum of 1983 (NAD 83)</horizdn>
+        <ellips>Geodetic Reference System 1980</ellips>
+        <semiaxis>6378137.000000</semiaxis>
+        <denflat>298.257222</denflat>
+      </geodetic>
+    </horizsys>
+    <vertdef />
+  </spref>
+  <eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>EVT</enttypl>
+        <enttypd>LF Remap EVT attributes spreadsheet.</enttypd>
+        <enttypds>LF Remap</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>VALUE</attrlabl>
+        <attrdef>Code that identifies the vegetation and land cover types.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>7008</rdommin>
+            <rdommax>9994</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>EVT_Name</attrlabl>
+        <attrdef>Existing Vegetation Type name. </attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><udom>See the ADD for additional information.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>LFRDB</attrlabl>
+        <attrdef>LF Reference Database code.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>7008</rdommin>
+            <rdommax>9994</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>EVT_Fuel</attrlabl>
+        <attrdef>EVT fuel code.</attrdef>
+        <attrdefs>LF Remap </attrdefs>
+        <attrdomv><rdom>
+            <rdommin>11</rdommin>
+            <rdommax>2969</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>EVT_Fuel_N</attrlabl>
+        <attrdef>EVT fuel name.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><udom>See the ADD for additional information.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+  <attrlabl>EVT_LF</attrlabl><attrdef>EVT lifeform. </attrdef><attrdefs>LF Remap</attrdefs><attrdomv>
+    <edom>
+      <edomv>Tree</edomv>
+      <edomvd>Tree lifeform.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Shrub</edomv>
+      <edomvd>Shrub lifeform.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Agriculture</edomv>
+      <edomvd>Agriculture.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Developed</edomv>
+      <edomvd>Developed.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Herb</edomv>
+      <edomvd>Herbaceous lifeform.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Sparse</edomv>
+      <edomvd>Sparse.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+</attr>
+      <attr>
+        <attrlabl>EVT_GP</attrlabl>
+        <attrdef>EVT group code.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>11</rdommin>
+            <rdommax>783</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+  <attrlabl>EVT_PHYS</attrlabl><attrdef>EVT physiognomy. </attrdef><attrdefs>LF Remap</attrdefs><attrdomv>
+    <edom>
+      <edomv>Hardwood</edomv>
+      <edomvd>Hardwood.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Grassland</edomv>
+      <edomvd>Grassland.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Shrubland</edomv>
+      <edomvd>Shrubland.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Conifer</edomv>
+      <edomvd>Conifer.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Riparian</edomv>
+      <edomvd>Riparian.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Conifer-hardwood</edomv>
+      <edomvd>Conifer hardwood.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Exotic Herbaceous</edomv>
+      <edomvd>Exotic herbaceous.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Exotic Tree-shrub</edomv>
+      <edomvd>Exotic tree shrub.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Sparsely vegetated</edomv>
+      <edomvd>Sparse</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Developed-high intensity</edomv>
+      <edomvd>High development.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Developed-low intensity</edomv>
+      <edomvd>Low development.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Developed-medium intensity</edomv>
+      <edomvd>Moderate development.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Developed-roads</edomv>
+      <edomvd>Roads.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Agricultural</edomv>
+      <edomvd>Agriculture.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Developed</edomv>
+      <edomvd>Developed.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Snow-ice</edomv>
+      <edomvd>Snow or ice.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Open water</edomv>
+      <edomvd>Water.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Quarries-strip mines-gravel pits-well and wind pads</edomv>
+      <edomvd>Quarries, strip mines, gravel pits, or wind pads.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Ruderal wet meadow and marsh</edomv>
+      <edomvd>Ruderal.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+</attr>
+      <attr>
+        <attrlabl>EVT_GP_N</attrlabl>
+        <attrdef>EVT group name.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><udom>See ADD for additional information.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>SAF_SRM</attrlabl>
+        <attrdef>Crosswalk to Society of American Foresters and Society for Range Management cover type.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><udom>Crosswalk to Society of American Foresters and Society for Range Management cover type.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+  <attrlabl>EVT_ORDER</attrlabl><attrdef>EVT physiognomic order from FGDC classification.</attrdef><attrdefs>LF Remap</attrdefs><attrdomv>
+    <edom>
+      <edomv>Tree-dominated</edomv>
+      <edomvd>Tree dominated.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Shrub-dominated</edomv>
+      <edomvd>Shrub dominated.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Herbaceous/Nonvascular-dominated</edomv>
+      <edomvd>Herbaceous dominated.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>No dominant lifeform</edomv>
+      <edomvd>No dominant lifeform.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Non-vegetated</edomv>
+      <edomvd>Non-vegetated.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+</attr>
+      <attr>
+  <attrlabl>EVT_CLASS</attrlabl><attrdef>EVT physiognomic class from FGDC classification.</attrdef><attrdefs>LF Remap</attrdefs><attrdomv>
+    <edom>
+      <edomv>Closed tree canopy</edomv>
+      <edomvd>Closed canopy.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Herbaceous-shrub-steppe</edomv>
+      <edomvd>Herbaceous shrub steppe.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Herbaceous-grassland</edomv>
+      <edomvd>Grassland.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Shrubland</edomv>
+      <edomvd>Shrubland.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Sparse tree canopy</edomv>
+      <edomvd>Sparse canopy.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Open tree canopy</edomv>
+      <edomvd>Open canopy.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Dwarf-shrubland</edomv>
+      <edomvd>Dwarf shrub.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>No dominant lifeform</edomv>
+      <edomvd>No dominant lifeform.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Sparsely vegetated</edomv>
+      <edomvd>Sparsely vegetated.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+  <attrdomv>
+    <edom>
+      <edomv>Non-vegetated</edomv>
+      <edomvd>Non-vegetated.</edomvd>
+      <edomvds>LF Remap</edomvds>
+    </edom>
+  </attrdomv>
+</attr>
+      <attr>
+        <attrlabl>EVT_SBCLS</attrlabl>
+        <attrdef>EVT physiognomic subclass from FGDC classification.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><udom>See ADD for additional information.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>R</attrlabl>
+        <attrdef>Red color value/255</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>0</rdommin>
+            <rdommax>255</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>G</attrlabl>
+        <attrdef>Green color value/255</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>0</rdommin>
+            <rdommax>255</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>B</attrlabl>
+        <attrdef>Blue color value/255</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>0</rdommin>
+            <rdommax>255</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>RED</attrlabl>
+        <attrdef>Red color value.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>1.0</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>GREEN</attrlabl>
+        <attrdef>Green color value.</attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>1.0</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>BLUE</attrlabl>
+        <attrdef>Blue color value. </attrdef>
+        <attrdefs>LF Remap</attrdefs>
+        <attrdomv><rdom>
+            <rdommin>0.0</rdommin>
+            <rdommax>1.0</rdommax>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+    <overview>
+      <eaover>LANDFIRE (LF) Remap Existing Vegetation Type (EVT). An Attribute Table is included with each product download as a .dbf and embedded in the metadata. The Attribute Data Dictionary (ADD) can be found at https://www.landfire.gov/.</eaover>
+      <eadetcit>https://www.landfire.gov/evt.php</eadetcit>
+    </overview>
+  </eainfo>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>LANDFIRE, Earth Resources Observation and Science Center (EROS), U.S. Geological Survey</cntorg>
+        </cntorgp>
+        <cntpos>Customer Service Representative</cntpos>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>47914 252nd Street</address>
+          <city>Sioux Falls</city>
+          <state>SD</state>
+          <postal>57198</postal>
+          <country>U.S.</country>
+        </cntaddr>
+        <cntvoice>605-594-6151</cntvoice>
+        <cntemail>helpdesk@landfire.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>This product is reproduced from geospatial information prepared by the U.S. Department of the Interior (DOI) USGS EROS. By removing the contents of this package or taking receipt of these files via electronic file transfer methods, you understand that the data stored on this media can be updated at any time. Represented features may not be in an accurate geographic location. USGS EROS makes no expressed or implied warranty, including warranty of merchantability and fitness, with respect to the character, function, or capabilities of the data or their appropriateness for any user's purposes. USGS EROS reserves the right to correct, update, modify, or replace this geospatial information without notification.</distliab>
+    <stdorder>
+      <digform><digtinfo>
+<formname>ARCG</formname>
+<formverd>20200731</formverd> 
+<formspec>LF Remap</formspec>
+</digtinfo>
+<digtopt><onlinopt><computer><networka><networkr>https://www.landfire.gov</networkr></networka></computer></onlinopt></digtopt></digform>
+      <fees>none</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20200731</metd>
+    <metc>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>LANDFIRE, Earth Resources Observation and Science Center (EROS), U.S. Geological Survey</cntorg>
+        </cntorgp>
+        <cntpos>Customer Service Representative</cntpos>
+        <cntaddr>
+          <addrtype>physical</addrtype>
+          <address>47914 252nd Street</address>
+          <city>Sioux Falls</city>
+          <state>SD</state>
+          <postal>57198</postal>
+          <country>U.S.</country>
+        </cntaddr>
+        <cntvoice>605-594-6151</cntvoice>
+        <cntemail>helpdesk@landfire.gov</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+    <mettc>local time</mettc>
+    <metsi>
+<metscs>None</metscs>
+<metsc>Unclassified</metsc>
+<metshd>None</metshd>
+</metsi>
+  </metainfo>
+</metadata>

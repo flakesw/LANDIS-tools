@@ -77,7 +77,7 @@ for(i in 1:nrow(input_mods_times)){
                                      can_regresison_rds_loc = can_regresison_rds_loc,
                                      can_regression_rds_no_sp_loc = can_regression_rds_no_sp_loc,
                                      shrub_regression_loc = shrub_regression_loc,
-                                     class = TRUE)
+                                     class = FALSE)
     },
     error = function(cond) {
       
