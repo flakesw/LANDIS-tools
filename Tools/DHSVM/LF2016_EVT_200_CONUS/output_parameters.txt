@@ -1,0 +1,20 @@
+Raster Download Information
+
+Number of Columns: 6210
+Number of Rows: 7170
+Resolution in x direction: 30.0 Meter
+Resolution in y direction: -30.0 Meter
+
+Coordinate system ID Native: 5070
+Top edge Native: 2131700.4316 Meter
+Bottom edge Native: 1916584.7934 Meter
+Left edge Native: -2173363.0594 Meter
+Right edge Native: -1987008.2233 Meter
+
+Coordinate system ID WGS84: 4326
+Top edge WGS84: 39.6465 Degree
+Bottom edge WGS84: 38.0001 Degree
+Left edge WGS84: -121.2838 Degree
+Right edge WGS84: -119.6078 Degree
+
+Download Format: GeoTiff_with_attribs
