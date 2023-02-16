@@ -1,0 +1,44 @@
+Maximum stomatal conductance values in mmol m-2 s-1
+
+Ponderosa pine: maximum conductance 100-300
+Hubbard, R. M., M. G. Ryan, V. Stiller, and J. S. Sperry. 2001. Stomatal conductance and photosynthesis vary linearly with plant hydraulic conductance in ponderosa pine. Plant, Cell & Environment 24:113–121.
+Monson, R. K., and M. C. Grant. 1989. Experimental Studies of Ponderosa Pine. III. Differences in Photosynthesis, Stomatal Conductance, and Water-Use Efficiency Between Two Genetic Lines. American Journal of Botany 76:1041–1047.
+Panek, J. A., and A. H. Goldstein. 2001. Response of stomatal conductance to drought in ponderosa pine: implications for carbon and ozone uptake. Tree Physiology 21:337–344.
+
+Blue oak: 200
+Xu, L., and D. D. Baldocchi. 2003. Seasonal trends in photosynthetic parameters and stomatal conductance of blue oak (Quercus douglasii) under prolonged summer drought and high temperature. Tree Physiology 23:865–877.
+Matzner, S. L., K. J. Rice, and J. H. Richards. 2003. Patterns of stomatal conductance among blue oak (Quercus douglasii) size classes and populations: implications for seedling establishment. Tree Physiology 23:777–784.
+
+
+Juniper: 150
+McDowell, N. G., S. White, and W. T. Pockman. 2008. Transpiration and stomatal conductance across a steep climate gradient in the southern Rocky Mountains. Ecohydrology 1:193–204.
+
+Douglas-fir: 70-160
+Woodruff, D. R., K. A. Mcculloh, J. M. Warren, F. C. Meinzer, and B. Lachenbruch. 2007. Impacts of tree height on leaf hydraulic architecture and stomatal control in Douglas-fir. Plant, Cell & Environment 30:559–569.
+Fuchs, E. E., and N. J. Livingston. 1996. Hydraulic control of stomatal conductance in Douglas fir [Pseudotsuga menziesii (Mirb.) Franco] and alder [Alnus rubra (Bong)] seedlings. Plant, Cell & Environment 19:1091–1098.
+Bond, B. J., and K. L. Kavanagh. 1999. Stomatal behavior of four woody species in relation to leaf-specific hydraulic conductance and threshold water potential. Tree Physiology 19:503–510.
+
+White fir: 70
+Goulden, M. L., and A. W. Fellows. (n.d.). Does Thinning Improve the Soil Water Balance and Vegetation Health of Southern Californian Forest?
+
+Western hemlock:200
+Bond, B. J., and K. L. Kavanagh. 1999. Stomatal behavior of four woody species in relation to leaf-specific hydraulic conductance and threshold water potential. Tree Physiology 19:503–510.
+
+Populus tremuloides: 250
+Ewers, B. E., D. S. Mackay, and S. Samanta. 2007. Interannual consistency in canopy stomatal conductance control of leaf water potential across seven tree species. Tree Physiology 27:11–24.
+
+Pinyon-juniper: 100
+Garcia-Forner, N., H. D. Adams, S. Sevanto, A. D. Collins, L. T. Dickman, P. J. Hudson, M. J. B. Zeppel, M. W. Jenkins, H. Powers, J. Martínez-Vilalta, and N. G. Mcdowell. 2016. Responses of two semiarid conifer tree species to reduced precipitation and warming reveal new perspectives for stomatal regulation. Plant, Cell & Environment 39:38–49.
+
+Cottonwood: 250
+Williams, C. A., and D. J. Cooper. 2005. Mechanisms of Riparian Cottonwood Decline Along Regulated Rivers. Ecosystems 8:382–395.
+
+Lodgepole pine: 200
+Massman, W. J., and M. R. Kaufmann. 1991. Stomatal response to certain environmental factors: a comparison of models for subalpine trees in the Rocky Mountains. Agricultural and Forest Meteorology 54:155–167.
+
+
+Ceanothus: 200
+Pittermann, J., J. Lance, L. Poster, A. Baer, and L. R. Fox. 2014. Heavy browsing affects the hydraulic capacity of Ceanothus rigidus (Rhamnaceae). Oecologia 175:801–810.
+Tenhunen, J. D., R. Hanano, M. Abril, E. W. Weiler, and W. Hartung. 1994. Above- and Below-Ground Environmental Influences on Leaf Conductance of Ceanothus thyrsiflorus Growing in a Chaparral Environment: Drought Response and the Role of Abscisic Acid. Oecologia 99:306–314.
+
+
