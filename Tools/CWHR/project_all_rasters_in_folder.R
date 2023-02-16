@@ -15,7 +15,7 @@ project_to_template <- function(input_raster, template){
   return(out_raster)
 }
 
-input_folder <- "E:/TCSI LANDIS/test/" #folder containing all the rasters to project
+input_folder <- "E:/TCSI LANDIS/Outputs_to_DHSVM_new/" #folder containing all the rasters to project
 output_folder <- input_folder #change this if you want to!
 
 if(!dir.exists(paste0(output_folder, "projected"))){
@@ -32,9 +32,9 @@ rasters_stripped <- sub('//..*$', '', basename(raster_list))
 for(i in 1:length(raster_list)){
   oldrast <- suppressWarnings(rast(paste0(input_folder, raster_list[i])))
   newrast <- project_to_template(oldrast, template) %>%
-    terra::project("epsg:32610") #CHANGE THIS for expected output
+    terra::project("epsg:32610", method = "near") #CHANGE THIS for expected output
   terra::writeRaster(newrast, 
-                     paste0(output_folder, "projected/",rasters_stripped[i], ".tif"),
+                     paste0(output_folder, "projected/",rasters_stripped[i]),
                      filetype = "GTiff",
                      datatype = ifelse(is.int(oldrast), "INT2S", "FLT4S"),
                      overwrite = TRUE)

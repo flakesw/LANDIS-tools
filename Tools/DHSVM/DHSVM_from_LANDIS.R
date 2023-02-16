@@ -44,7 +44,7 @@ landis_folders <- paste0(landis_folders[grep("Scenario", landis_folders)], "/")[
 template <- terra::rast("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Inputs/masks_boundaries/mask_9311.tif")
 
 #where should the outpuits go?
-output_folder <- "E:/TCSI LANDIS/Outputs_to_DHSVM/"
+output_folder <- "E:/TCSI LANDIS/Outputs_to_DHSVM_new/"
 
 #Combinations of timesteps and landis runs
 input_mods_times <- expand.grid(landis_folders, timesteps) %>%
