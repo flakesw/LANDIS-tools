@@ -6,9 +6,9 @@ library(tidyverse)
 evt <- rast("./LF2016_EVT_200_CONUS/LC16_EVT_200.tif")
 plot(evt)
 
-dhsvm <- rast("E:/TCSI LANDIS/test/projected/Scenario1 - cnrm - Run 1 -  veg-ID- 0 .tif.tif") %>%
+dhsvm <- rast("E:/TCSI LANDIS/test/projected/Scenario1 - cnrm - Run 1 -  veg-ID- 0 .tif") %>%
   terra::project(evt, method = "near", mask = TRUE)
-
+table(values(dhsvm))
 plot(dhsvm)
 
 evt_subset <- terra::mask(evt, dhsvm) %>% crop(dhsvm)
@@ -35,13 +35,11 @@ understory_types_dhsvm <- c(102, 202, 302, 402, 502, 602, 702, 802, 902, 1002, 1
 
 evt_at_dhsvm_shrub <- values(terra::mask(evt_subset, dhsvm, maskvalues = 1402, inverse = TRUE)) %>%
   `[`(!is.na(.))
-table(evt_at_dhsvm_shrub %in% open_types) #>50% open at sites classified as shrubs
-table((values(evt_subset) %>% `[`(!is.na(.))) %in% open_types) #only 23% open in whole area
+table(evt_at_dhsvm_shrub %in% c(open_types, woodland_types)) #>50% open at sites classified as shrubs
+table((values(evt_subset) %>% `[`(!is.na(.))) %in% c(open_types, woodland_types)) #only 23% open in whole area
 
-
-
-dhsvm_at_evt_shrub <- values(terra::mask(dhsvm, evt_subset, maskvalues = open_types, inverse = TRUE)) %>%
+dhsvm_at_evt_shrub <- values(terra::mask(dhsvm, evt_subset, maskvalues = c(open_types, woodland_types), inverse = TRUE)) %>%
   `[`(!is.na(.))
-table((dhsvm_at_evt_shrub))
-
+table((dhsvm_at_evt_shrub) %in% understory_types_dhsvm)
+table(values(dhsvm) %in% understory_types_dhsvm)
 

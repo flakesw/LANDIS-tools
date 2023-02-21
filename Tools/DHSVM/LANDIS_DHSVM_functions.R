@@ -257,13 +257,13 @@ create_canopy_cover_raster <- function(output_folder,
     message("   Writing canopy cover class raster to ", paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"))
     cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc_class")]) %>%
       terra::clamp(lower = 0, upper = 4, values = FALSE)
-    writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
+    writeRaster(cc_raster, paste0(output_folder, file_prefix, "cc_class-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing canopy cover class raster")
   } else if(class == FALSE){
     message("   Writing canopy cover continuous values raster to ", paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"))
     cc_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "cc")]) %>%
       terra::clamp(lower = 0, upper = 1, values = FALSE)
-    writeRaster(cc_raster, paste(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
+    writeRaster(cc_raster, paste0(output_folder, file_prefix, "cc_continuous-", timestep, ".tif"), overwrite = TRUE)
     message("   Done writing canopy cover continuous values raster")
   }
 }
@@ -489,7 +489,7 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
     dplyr::inner_join(class_table, by = c("CWHR_type" = "type")) %>%
     mutate(DHSVM_code = as.numeric(paste0(as.character(num), ifelse(shrub_proportion > 0.01 | shrub_cover > 0.2, "02", "01"))))%>%
     # mutate(in_ref = DHSVM_code %in% reference_types) %>%
-    mutate(DHSVM_code = case_when(shrub_cover > 0.3 & cc < 0.1 ~ 1402,
+    mutate(DHSVM_code = case_when(shrub_cover > 0.2 & cc < 0.1 ~ 1402,
                                   TRUE ~ DHSVM_code)) %>%
     mutate(DHSVM_code = case_when(CWHR_type == "mch" ~ 1402,
                                   # !in_ref ~ NA,
@@ -501,7 +501,7 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
   
   cwhr_raster <- terra::classify(comm_raster, rcl = comm_matrix[, c("MapCode", "DHSVM_code")], others = NA)
   
-  writeRaster(cwhr_raster, paste(output_folder, prefix, "veg-ID-", timestep, ".tif"), overwrite = TRUE)
+  writeRaster(cwhr_raster, paste0(output_folder, prefix, "veg-ID-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing veg ID raster")
   
   
@@ -519,7 +519,7 @@ process_DHSVM_layers_and_write_rasters <- function(landis_folder,
     terra::clamp(lower = min(unique(comm_matrix$ht_95)),
                  upper = max(unique(comm_matrix$ht_95)),
                  values = FALSE)
-  writeRaster(ht_raster, paste(output_folder, prefix, "can-ht-", timestep, ".tif"), overwrite = TRUE)
+  writeRaster(ht_raster, paste0(output_folder, prefix, "can-ht-", timestep, ".tif"), overwrite = TRUE)
   message("   Done writing height raster")
   
   gc()
