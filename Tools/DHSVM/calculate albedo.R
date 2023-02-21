@@ -1,10 +1,10 @@
 #create albedo timeseries for each veg type
 
-dhsvm <- rast("E:/TCSI LANDIS/test/projected/Scenario1 - cnrm - Run 1 -  veg-ID- 0 .tif.tif") 
+dhsvm <- rast("E:/TCSI LANDIS/Outputs_to_DHSVM_new/initial/veg-id-0.tif") 
 dhsvm
 
 
-albedo <- rast("./average_monthly_albedo.tif")%>%
+albedo <- rast("./average_monthly_albedo_IR.tif")%>%
   terra::project(dhsvm, method = "bilinear", mask = TRUE)
 albedo
 plot(albedo)
@@ -26,7 +26,7 @@ veg_table$month = rep(1:12, times = length(veg_categories))
 veg_table$albedos <- veg_table$albedos/1000
 veg_table <- veg_table[order(veg_table$V1), ]
 
-write.csv(veg_table, "albedo_by_month_with_snow.csv")
+write.csv(veg_table, "albedo_by_month_shortwave.csv")
 
 
 

@@ -15,7 +15,7 @@ project_to_template <- function(input_raster, template){
   return(out_raster)
 }
 
-input_folder <- "E:/TCSI LANDIS/Outputs_to_DHSVM_new/" #folder containing all the rasters to project
+input_folder <- "C:/Users/swflake/Documents/TCSI-conservation-finance/Models/Model run templates/Scenario1 - no disturbance - oneyear/NECN/" #folder containing all the rasters to project
 output_folder <- input_folder #change this if you want to!
 
 if(!dir.exists(paste0(output_folder, "projected"))){
@@ -27,16 +27,16 @@ template <- rast("C:/Users/swflake/Documents/TCSI-conservation-finance/Models/In
 raster_list <- list.files(input_folder)
 raster_list <- raster_list[grepl(".img", raster_list) | grepl(".tif", raster_list)]
 
-rasters_stripped <- sub('//..*$', '', basename(raster_list))
+rasters_stripped <- sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(rasters_stripped))
 
 for(i in 1:length(raster_list)){
   oldrast <- suppressWarnings(rast(paste0(input_folder, raster_list[i])))
   newrast <- project_to_template(oldrast, template) %>%
     terra::project("epsg:32610", method = "near") #CHANGE THIS for expected output
   terra::writeRaster(newrast, 
-                     paste0(output_folder, "projected/",rasters_stripped[i]),
+                     paste0(output_folder, "projected/",rasters_stripped[i], ".tif"),
                      filetype = "GTiff",
-                     datatype = ifelse(is.int(oldrast), "INT2S", "FLT4S"),
+                     datatype = ifelse(is.int(oldrast), "INT4S", "FLT4S"),
                      overwrite = TRUE)
 }
 
