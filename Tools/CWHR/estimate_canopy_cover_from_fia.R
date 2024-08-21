@@ -155,6 +155,23 @@ summary(cc_no_cwhr_lm)
 
 cwhr_types <- unique(fia_plot_remove_rare$CWHR_type)[!is.na(unique(fia_plot_remove_rare$CWHR_type))]
 
+
+# Make plots of cc ~ biomass ---------------------------------------------------
+
+# layout(mat = matrix(c(1:12), nrow = 4, ncol = 3, byrow = TRUE), height = 1, width = 1)
+
+svg(filename = "cc_regressions.svg",
+    width = 7, height = 10, pointsize = 9)
+
+col_ramp <- c('#feb24c','#a1dab4','#41b6c4','#2c7fb8','#253494')
+titles <- c("Chaparral", "Lodgepole pine", "Ponderosa pine", "Western juniper",
+            "Sierra mixed conifer", "Jeffrey pine", "White fir", "Subalpine mixed conifer",
+            "Red fir", "Douglas-fir", "Mixed hardwood", "All vegetation types")
+
+par(mfrow = c(4,3),
+    mar = c(2,2,1,1),
+    oma = c(3,3,0,0))
+
 newdata = expand.grid(total_biomass = seq(0, 1000, length.out = 1000),
                       # mean_age = c(0, 10, 30, 70, 120, 240),
                       seral_stage = c(1,2,3,4,5),
@@ -165,42 +182,83 @@ for(i in 1:length(cwhr_types)){
   fia_tree_sub <- fia_trees[fia_trees$PLT_CN %in% fia_plot_sub$CN, ]
   
   plot(fia_plot_sub$cc ~ fia_plot_sub$total_biomass,
-       main = cwhr_types[i], 
+       col = col_ramp[fia_plot_sub$seral_stage],
+       bg = col_ramp[fia_plot_sub$seral_stage],
+       pch = 21,
+       main = titles[i], 
        xlim = c(0, 400),
-       ylim = c(0, 1))
+       ylim = c(0, 1),
+       xlab = "",
+       ylab = "",
+       xaxt = "n",
+       yaxt = "n")
   abline(h = c(0.4, 0.6))
+  
+  axis(1, at = c(0,100,200,300,400), labels = FALSE)
+  axis(2, at = c(0,.2,.4,.6,.8,1), labels = FALSE)
+  if(i %in% c(1,4,7,10)) axis(2)
+  if(i %in% c(10,11)) axis(1)
+  
   for(j in unique(newdata$seral_stage)){
     newdat <- newdata[newdata$CWHR_type == cwhr_types[i] &
                                   newdata$seral_stage == j, ]
     preds <- invlogit(predict(cc_lm, newdat))
-    lines( preds ~ newdat$total_biomass)
+    lines( preds ~ newdat$total_biomass, col = col_ramp[j])
     text(y = preds[300], x = 300, 
          labels = j)
     
     }
 }
 
+
 newdata = expand.grid(total_biomass = seq(0, 400, length.out = 1000),
                       seral_stage = c(1,2,3,4,5))
 
-fia_plot_sub <- fia_plot2[!(fia_plot2$CWHR_type %in% cwhr_types), ]
-fia_tree_sub <- fia_trees[fia_trees$PLT_CN %in% fia_plot_sub$CN, ]
+fia_plot_sub <- fia_plot2[!is.na(fia_plot2$total_biomass) &
+                            !is.na(fia_plot2$mean_age) & 
+                            !is.na(fia_plot2$CWHR_type), ]
 
 plot(fia_plot_sub$cc ~ fia_plot_sub$total_biomass,
-     main = "all", 
+     col = col_ramp[fia_plot_sub$seral_stage],
+     bg = col_ramp[fia_plot_sub$seral_stage],
+     pch = 21,
+     main = "All vegetation types", 
      xlim = c(0, 400),
-     ylim = c(0, 1))
+     ylim = c(0, 1),
+     mar = c(0,0,0,0),
+     oma = c(0,0,0,0),
+     xlab = "",
+     ylab = "",
+     xaxt = "n",
+     yaxt = "n")
 abline(h = c(0.4, 0.6))
+
+axis(1, at = c(0,100,200,300,400), labels = FALSE)
+axis(2, at = c(0,.2,.4,.6,.8,1), labels = FALSE)
+axis(1)
+
 for(j in unique(newdata$seral_stage)){
   newdat <- newdata[newdata$seral_stage == j, ]
   preds <- invlogit(predict(cc_no_cwhr_lm, newdat))
-  lines( preds ~ newdat$total_biomass)
+  lines(preds ~ newdat$total_biomass,
+         col = col_ramp[j])
   text(y = preds[750], x = 300, 
        labels = j)
-  
 }
 
-#need to reduce CC for SCN, SMC, RFR
+mtext(text = expression("Site biomass (Mg ha"^-1*")"),
+      side = 1,
+      line = 1,
+      outer = TRUE)
+mtext(text = expression("Canopy cover (proportion)"),
+      side = 2,
+      line = 1,
+      outer = TRUE)
+
+
+
+
+dev.off()
 
 ################################################################################
 # Export models
