@@ -1,1 +1,1 @@
-Test
+This folder has some scripts to help with generating the establishment parameters for NECN. It uses FIA data on tree occurence to calculate LAI, and then uses the FIA seedling data to figure out what plots (and LAI) are most likely to have seedlings. Check out weibull_vignette.pdf which walks you through the process, and then either weibull_params_example.R which has a stripped down version to play with, or get_weibull_params_from_fia_all_data.R for the full thing.
